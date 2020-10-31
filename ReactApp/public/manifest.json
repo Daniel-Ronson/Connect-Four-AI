@@ -1,0 +1,11 @@
+{
+  "short_name": "Connect Four",
+  "name": "Connect Four Ai",
+  "icons": [
+
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
