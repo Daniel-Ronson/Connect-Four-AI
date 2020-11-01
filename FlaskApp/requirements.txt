@@ -1,3 +1,3 @@
 flask==1.1.2
 python-dotenv==0.15.0
-Flask-API
+Flask-API==2.0
