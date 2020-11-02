@@ -1,6 +1,6 @@
 import './ConnectFour.css'
 import React, { Component } from 'react';
-
+import {postBoardState} from '../../Requests/ConnectFourRequest'
 class ConnectFour extends React.Component {
     constructor(props) {
       super(props);
@@ -11,7 +11,8 @@ class ConnectFour extends React.Component {
         currentPlayer: null,
         board: [],
         gameOver: false,
-        message: ''
+        message: '',
+        gameType: 'singlePlayer'
       };
       
       // Bind play function to App component
@@ -41,6 +42,7 @@ class ConnectFour extends React.Component {
     }
     
     play(c) {
+
       if (!this.state.gameOver) {
         // Place piece on board
         let board = this.state.board;
@@ -59,12 +61,22 @@ class ConnectFour extends React.Component {
           this.setState({ board, gameOver: true, message: 'Player 2 (yellow) wins!' });
         } else if (result === 'draw') {
           this.setState({ board, gameOver: true, message: 'Draw game.' });
-        } else {
+        } 
+        
+        // Game continues
+        else {
           this.setState({ board, currentPlayer: this.togglePlayer() });
+
+          // Call AI algorithm if Single Player game
+          if(this.state.gameType == 'singlePlayer'){
+            postBoardState(board)  // Make call to AI algorithm
+          }
+
         }
       } else {
         this.setState({ message: 'Game over. Please start a new game.' });
       }
+
     }
     
     checkVertical(board) {
