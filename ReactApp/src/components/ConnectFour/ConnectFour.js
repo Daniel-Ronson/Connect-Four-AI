@@ -147,10 +147,16 @@ class ConnectFour extends React.Component {
     }
     
     render() {
+      let button
+      if(this.state.gameOver == true){
+        button = <div className="button" onClick={() => {this.initBoard()}}>New Game</div>          
+      }
+      else{
+        button = <div>Game in Progress</div>
+      }
       return (
         <div>
-          <div className="button" onClick={() => {this.initBoard()}}>New Game</div>
-          
+          {button}        
           <table>
             <thead>
             </thead>

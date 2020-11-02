@@ -1,10 +1,31 @@
+:root {
+  --gray-white: #f4f4f2;
+  --gray-one: #e8e8e8;
+  --gray-two: #bbbfca;
+  --gray-three: #495464;
+}
+.navbar-app{
+  background-color: var(--gray-two);
+}
+.container-app{
+  background-color: var(--gray-two);
+}
+
 .App {
   text-align: center;
+  background-color: var(--gray-one);
 }
 
 .App-logo {
   height: 40vmin;
   pointer-events: none;
+}
+
+.marginBottom{
+  margin-bottom: 20px;
+}
+.marginTop{
+  margin-top: 20px;
 }
 
 @media (prefers-reduced-motion: no-preference) {

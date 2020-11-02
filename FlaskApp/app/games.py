@@ -261,6 +261,7 @@ class Game:
         state = self.initial
         while True:
             for player in players:
+                print(state.board)
                 move = player(self, state)
                 state = self.result(state, move)
                 if self.terminal_test(state):
