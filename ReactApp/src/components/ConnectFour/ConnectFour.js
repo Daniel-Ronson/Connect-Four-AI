@@ -37,22 +37,42 @@ class ConnectFour extends React.Component {
       });
     }
     
-    togglePlayer() {
-      return (this.state.currentPlayer === this.state.player1) ? this.state.player2 : this.state.player1;
+    togglePlayer(togglePlayer = this.state.currentPlayer ) {
+      return ( this.state.currentPlayer  == this.state.player1) ? this.state.player2 : this.state.player1;
     }
     
-    play(c) {
 
-      if (!this.state.gameOver) {
+    makeMove(c,board,currentPlayer=this.state.currentPlayer){
         // Place piece on board
-        let board = this.state.board;
         for (let r = 5; r >= 0; r--) {
           if (!board[r][c]) {
-            board[r][c] = this.state.currentPlayer;
-            break;
+            board[r][c] = currentPlayer;
+            return board;
           }
         }
-  
+    }
+    // aiMove(board,toggle_player){
+    //         // let ai_move_column = await postBoardState(board)  // Make call to AI algorithm
+    //         if(this.state.gameType == 'singlePlayer' && toggle_player == this.state.player2){
+    //           let ai_move_column = 2  // Make call to AI algorithm
+    //           toggle_player = this.togglePlayer()
+    //           console.log('after call to ai: ' + this.state.currentPlayer + ' toggle player = ' + toggle_player)
+    //           console.log('player ' + toggle_player + ' making move at: ' + ai_move_column)
+    //           board = this.makeMove(ai_move_column,board,toggle_player)
+    //           this.setState({ board, currentPlayer: this.state.player1});
+    //           console.log('player ' +  this.state.player1)
+    //         }
+    // }
+    
+    async play(c) {
+
+      if (!this.state.gameOver) {
+
+        // Place piece on board
+        let board = this.state.board;
+        board = this.makeMove(c,board)
+        console.log('player: ' + this.state.currentPlayer + ' makes the move at: ' + c)
+
         // Check status of board
         let result = this.checkAll(board);
         if (result === this.state.player1) {
@@ -65,11 +85,22 @@ class ConnectFour extends React.Component {
         
         // Game continues
         else {
-          this.setState({ board, currentPlayer: this.togglePlayer() });
+
+          // setState is asynchronous so I define toggle_player as a local variable 
+          let toggle_player = this.togglePlayer()
+          console.log('before call to ai: ' + this.state.currentPlayer + ' toggle player = ' + toggle_player)
+
+          this.setState({ board, currentPlayer: toggle_player });  
 
           // Call AI algorithm if Single Player game
-          if(this.state.gameType == 'singlePlayer'){
-            postBoardState(board)  // Make call to AI algorithm
+          if(this.state.gameType == 'singlePlayer' && toggle_player == this.state.player2){
+            let ai_move_column = await postBoardState(board)  // Make call to AI algorithm
+            console.log('column: ' + ai_move_column)
+            console.log('after call to ai: ' + this.state.currentPlayer + ' toggle player = ' + toggle_player)
+            console.log('player ' + toggle_player + ' making move at: ' + ai_move_column)
+            board = this.makeMove(ai_move_column,board,toggle_player)
+            this.setState({ board, currentPlayer: this.state.player1});
+            console.log('player ' +  this.state.player1)
           }
 
         }
