@@ -17,10 +17,10 @@ def write_to_file(info):
 if __name__ == "__main__":
 
     print("test")
-    c4 = ConnectFour(7,6,4)
+    c4 = ConnectFour(6,7,4)
     print("test")
     #utility = c4.play_game(alpha_beta_player, query_player)
-    utility = c4.play_game(alpha_beta_cutoff_player, query_player)  # computer moves first
+    utility = c4.play_game(query_player,alpha_beta_cutoff_player)  # computer moves first
     #utility = c4.play_game(query_player, alpha_beta_player)
     #utility = c4.play_game(random_player, query_player) 
 

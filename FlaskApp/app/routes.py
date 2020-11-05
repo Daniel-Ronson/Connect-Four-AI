@@ -1,7 +1,10 @@
-from app import app
+from app import app, games
 from flask import request, jsonify
 from flask_api import status, exceptions
 from flask_cors import CORS, cross_origin
+import numpy as np
+
+
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 import json
@@ -23,19 +26,56 @@ def test(data):
     else:
         return 'error', status.HTTP_404_NOT_FOUND  
 
-# 
+
 # Game starts in react App board is initialized to null
 # React App passes in board data to this method
 # this method makes a move with the AI, updates the board state, and passes it back to react app
 # React APp updates board on the front end
 @app.route('/game',methods=['POST'])
 @cross_origin()
-def game():
+def game():    
+    # Convert json to dict
     parameters = json.loads(request.data)
-    print(parameters)
+    # parameters = {'board': '[[2,1,1,2,2,1,null],[1,2,1,1,2,2,null]] ..........'}
+
+    # Convert board into a list
     board = parameters['board']
-    response  =  json.dumps(board)
-    print("in Game: " + board)
+    board = json.loads(board)
+    print(board)
+
+    # Create New Connect Four Game
+    c4 = games.ConnectFour(6,7,4)
+    state = c4.initial
+
+    #get movelist
+    moves = c4.getMoves(board)
+
+    #Convert board to readable state for AI algorithm
+    numpy_board = np.array(board)
+
+    # Find Xs and Y's
+    player_x = np.where(numpy_board == 1)
+    player_y = np.where(numpy_board == 2)
+
+    # Build state of board so that AI function can process it 
+    newBoard = {}
+    for x,y in zip(player_x[0],player_x[1]):
+        newBoard.update({(x+1,y+1) : 'X'})
+    for x,y in zip(player_y[0],player_y[1]):
+        newBoard.update({(x+1,y+1) : 'Y'})
+    print(newBoard)
+    # set board 
+
+    moves = c4.getMoves(board)
+    initialState = games.GameState(to_move=('Y'),
+                         utility=0,  board=newBoard, moves=moves)
+
+    move = games.alpha_beta_cutoff_player(c4, initialState)
+
+    print(moves)
+    print(move)
+
+    response  =  json.dumps({'row':move[0]-1,'column':move[1]-1})
     return response, status.HTTP_200_OK
 
 
