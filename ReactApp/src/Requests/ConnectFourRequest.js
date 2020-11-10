@@ -13,7 +13,6 @@ export const postBoardState = async (board) =>{
 
         // response.data = {row:6, column:2}
         let data = response.data.column
-        console.log(data)
         return data 
 
 }
