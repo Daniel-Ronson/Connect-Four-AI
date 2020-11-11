@@ -56,6 +56,7 @@ def game():
     # Find Xs and Y's
     player_x = np.where(numpy_board == 1)
     player_y = np.where(numpy_board == 2)
+    # tuple(arr[1,2,4], arr[0,2,1])
 
     # Build state of board so that AI function can process it 
     newBoard = {}
@@ -64,9 +65,9 @@ def game():
     for x,y in zip(player_y[0],player_y[1]):
         newBoard.update({(x+1,y+1) : 'Y'})
     print(newBoard)
+
     # set board 
 
-    moves = c4.getMoves(board)
     initialState = games.GameState(to_move=('Y'),
                          utility=0,  board=newBoard, moves=moves)
 

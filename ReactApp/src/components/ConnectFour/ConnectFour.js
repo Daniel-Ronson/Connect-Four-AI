@@ -1,5 +1,5 @@
 import './ConnectFour.css'
-import React, { Component } from 'react';
+import React from 'react';
 import {postBoardState} from '../../Requests/ConnectFourRequest'
 class ConnectFour extends React.Component {
     constructor(props) {
@@ -12,13 +12,24 @@ class ConnectFour extends React.Component {
         board: [],
         gameOver: false,
         message: '',
-        gameType: 'singlePlayer'
+        gameType: 'singlePlayer',
+        winningCoordinates: []
       };
       
       // Bind play function to App component
       this.play = this.play.bind(this);
     }
     
+     setCoordinates(coordinates){
+      // coordinates = [[1,2],[3,4]]
+                //let winningCoordinates = Object.assign({}, prevState.winningCoordinates)
+        let coords = [...this.state.winningCoordinates]
+        coordinates.map(el => coords.push(el))
+        this.setState({
+          winningCoordinates: coords
+        })  
+    }
+
     // Starts new game
     initBoard() {
       // Create a blank 6x7 matrix
@@ -33,12 +44,13 @@ class ConnectFour extends React.Component {
         board,
         currentPlayer: this.state.player1,
         gameOver: false,
-        message: ''
+        message: '',
+        winningCoordinates: []
       });
     }
     
     togglePlayer(togglePlayer = this.state.currentPlayer ) {
-      return ( this.state.currentPlayer  == this.state.player1) ? this.state.player2 : this.state.player1;
+      return ( this.state.currentPlayer  === this.state.player1) ? this.state.player2 : this.state.player1;
     }
     
 
@@ -51,19 +63,19 @@ class ConnectFour extends React.Component {
           }
         }
     }
-    // aiMove(board,toggle_player){
-    //         // let ai_move_column = await postBoardState(board)  // Make call to AI algorithm
-    //         if(this.state.gameType == 'singlePlayer' && toggle_player == this.state.player2){
-    //           let ai_move_column = 2  // Make call to AI algorithm
-    //           toggle_player = this.togglePlayer()
-    //           console.log('after call to ai: ' + this.state.currentPlayer + ' toggle player = ' + toggle_player)
-    //           console.log('player ' + toggle_player + ' making move at: ' + ai_move_column)
-    //           board = this.makeMove(ai_move_column,board,toggle_player)
-    //           this.setState({ board, currentPlayer: this.state.player1});
-    //           console.log('player ' +  this.state.player1)
-    //         }
-    // }
     
+    checkBoard(board){
+      return new Promise(resolve => {
+      let result = this.checkAll(board);
+      if (result === this.state.player1) {
+        this.setState({ board, gameOver: true, message: 'Player 1 (red) wins!' }, () => resolve());
+      } else if (result === this.state.player2) {
+        this.setState({ board, gameOver: true, message: 'Player 2 (yellow) wins!' }, () => resolve());
+      } else if (result === 'draw') {
+        this.setState({ board, gameOver: true, message: 'Draw game.' }, () => resolve());
+      } 
+    })
+  }
     async play(c) {
 
       if (!this.state.gameOver) {
@@ -71,7 +83,6 @@ class ConnectFour extends React.Component {
         // Place piece on board
         let board = this.state.board;
         board = this.makeMove(c,board)
-        console.log('player: ' + this.state.currentPlayer + ' makes the move at: ' + c)
 
         // Check status of board
         let result = this.checkAll(board);
@@ -84,33 +95,28 @@ class ConnectFour extends React.Component {
         } 
         
         // Game continues
-        else {
+        else if(this.state.gameOver === false) {
 
           // setState is asynchronous so I define toggle_player as a local variable 
           let toggle_player = this.togglePlayer()
-          console.log('before call to ai: ' + this.state.currentPlayer + ' toggle player = ' + toggle_player)
-
           this.setState({ board, currentPlayer: toggle_player });  
 
           // Call AI algorithm if Single Player game
-          if(this.state.gameType == 'singlePlayer' && toggle_player == this.state.player2){
+          if(this.state.gameType === 'singlePlayer' && toggle_player === this.state.player2){
             let ai_move_column = await postBoardState(board)  // Make call to AI algorithm
-            console.log('column: ' + ai_move_column)
-            console.log('after call to ai: ' + this.state.currentPlayer + ' toggle player = ' + toggle_player)
-            console.log('player ' + toggle_player + ' making move at: ' + ai_move_column)
             board = this.makeMove(ai_move_column,board,toggle_player)
             this.setState({ board, currentPlayer: this.state.player1});
-            console.log('player ' +  this.state.player1)
+            await this.checkBoard(this.state.board)
           }
 
         }
       } else {
-        this.setState({ message: 'Game over. Please start a new game.' });
+        this.setState({ message: 'Please start a new game.' });
       }
 
     }
     
-    checkVertical(board) {
+     checkVertical(board) {
       // Check only if row is 3 or greater
       for (let r = 3; r < 6; r++) {
         for (let c = 0; c < 7; c++) {
@@ -118,6 +124,7 @@ class ConnectFour extends React.Component {
             if (board[r][c] === board[r - 1][c] &&
                 board[r][c] === board[r - 2][c] &&
                 board[r][c] === board[r - 3][c]) {
+              this.setCoordinates([[r,c],[r-1,c],[r-2,c],[r-3,c]])
               return board[r][c];    
             }
           }
@@ -125,7 +132,7 @@ class ConnectFour extends React.Component {
       }
     }
     
-    checkHorizontal(board) {
+     checkHorizontal(board) {
       // Check only if column is 3 or less
       for (let r = 0; r < 6; r++) {
         for (let c = 0; c < 4; c++) {
@@ -133,6 +140,7 @@ class ConnectFour extends React.Component {
             if (board[r][c] === board[r][c + 1] && 
                 board[r][c] === board[r][c + 2] &&
                 board[r][c] === board[r][c + 3]) {
+                  this.setCoordinates([[r,c],[r,c+1],[r,c+2],[r,c+3]])
               return board[r][c];
             }
           }
@@ -185,18 +193,23 @@ class ConnectFour extends React.Component {
       return this.checkVertical(board) || this.checkDiagonalRight(board) || this.checkDiagonalLeft(board) || this.checkHorizontal(board) || this.checkDraw(board);
     }
     
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
       this.initBoard();
     }
     
     render() {
+      let board = [...this.state.board]; //2d array tracking player moves
+      let winningCoordinates = [...this.state.winningCoordinates] //2d array containing tuples of coordinates
       let button
-      if(this.state.gameOver == true){
+
+      if(this.state.gameOver === true){
         button = <div className="button" onClick={() => {this.initBoard()}}>New Game</div>          
       }
       else{
         button = <div>Game in Progress</div>
       }
+
+      let index = 0
       return (
         <div>
           {button}        
@@ -204,7 +217,7 @@ class ConnectFour extends React.Component {
             <thead>
             </thead>
             <tbody>
-              {this.state.board.map((row, i) => (<Row key={i} row={row} play={this.play} />))}
+              {board.map((row, i) => (<Column index = {index++} key={i} row={row} play={this.play} winningCoordinates = {winningCoordinates}/>))}
             </tbody>
           </table>
           
@@ -214,23 +227,36 @@ class ConnectFour extends React.Component {
     }
   }
   
-  // Row component
-  const Row = ({ row, play }) => {
+  // Column component
+  const Column = ({ index, row, play, winningCoordinates }) => {
+    let rowIndex = 0
     return (
       <tr>
-        {row.map((cell, i) => <Cell key={i} value={cell} columnIndex={i} play={play} />)}
+        {row.map((cell, i) => <Cell key={i} column= {index} row = {rowIndex++} value={cell} columnIndex={i} play={play} winningCoordinates = {winningCoordinates}/>)}
       </tr>
     );
   };
   
-  const Cell = ({ value, columnIndex, play }) => {
-    let color = '';
-    if (value === 1) {
-      color = 'red-background';
-    } else if (value === 2) {
-      color = 'yellow-background';
+  const Cell = ({ column, row,value, columnIndex, play, winningCoordinates}) => {
+
+    let flag = false
+    if(winningCoordinates.length > 0){
+      winningCoordinates.forEach(el =>{
+        let y = el[0]
+        let x= el[1]
+        if(column === y && row === x){
+          flag = true
+        }      
+      })
     }
-      
+
+  let color = '';
+   if (value === 1) {
+      color = flag === true? 'shiny-red': 'red-background' 
+    } else if (value === 2) {
+      color = flag === true? 'shiny-yellow': 'yellow-background' 
+    }
+     
     return (
       <td>
         <div className="cell" onClick={() => {play(columnIndex)}}>
