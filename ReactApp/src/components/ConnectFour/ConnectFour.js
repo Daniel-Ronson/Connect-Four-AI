@@ -8,6 +8,7 @@ class ConnectFour extends React.Component {
       this.state = {
         player1: 1,
         player2: 2,
+        shuffledUsed: false,
         currentPlayer: null,
         board: [],
         gameOver: false,
@@ -52,6 +53,7 @@ class ConnectFour extends React.Component {
     togglePlayer(togglePlayer = this.state.currentPlayer ) {
       return ( this.state.currentPlayer  === this.state.player1) ? this.state.player2 : this.state.player1;
     }
+
     
 
     makeMove(c,board,currentPlayer=this.state.currentPlayer){
@@ -192,6 +194,31 @@ class ConnectFour extends React.Component {
     checkAll(board) {
       return this.checkVertical(board) || this.checkDiagonalRight(board) || this.checkDiagonalLeft(board) || this.checkHorizontal(board) || this.checkDraw(board);
     }
+
+    shuffleBoard()
+    {
+        this.state.shuffledUsed = true;
+        var allTokensInBoard = [];
+        let board = this.state.board;
+
+        console.log(this.state.board)
+
+        for (let r = 0; r < 6; r++) {
+          for (let c = 0; c < 7; c++) {
+            if (board[r][c] != null) {
+                allTokensInBoard.push(board[r][c])
+                board[r][c] = null
+              }
+            }
+          }
+        console.log("This is the temp:" + allTokensInBoard)
+       for(let i = 0; i < allTokensInBoard.length; i++)
+       {
+         this.makeMove(Math.floor((Math.random() *7)),board,allTokensInBoard[i]);
+       }
+       this.setState({board: this.state.board});
+       this.checkBoard(board);
+    }
     
     UNSAFE_componentWillMount() {
       this.initBoard();
@@ -201,6 +228,11 @@ class ConnectFour extends React.Component {
       let board = [...this.state.board]; //2d array tracking player moves
       let winningCoordinates = [...this.state.winningCoordinates] //2d array containing tuples of coordinates
       let button
+      let button1
+
+      if(this.state.gameOver === false && this.state.shuffledUsed == false){
+        button1 = <div className="button1" onClick={() => {this.shuffleBoard()}}>Shuffle</div>          
+      }
 
       if(this.state.gameOver === true){
         button = <div className="button" onClick={() => {this.initBoard()}}>New Game</div>          
@@ -212,7 +244,8 @@ class ConnectFour extends React.Component {
       let index = 0
       return (
         <div>
-          {button}        
+          {button}
+          {button1}        
           <table>
             <thead>
             </thead>

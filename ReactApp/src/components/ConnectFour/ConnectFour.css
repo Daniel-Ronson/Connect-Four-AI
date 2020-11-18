@@ -28,6 +28,22 @@ body {
     cursor: pointer;
     transition: background-color 0.5s, color 0.5s;
   }
+  .button1 {
+    background-color: #303030;
+    color: #ff9050;
+    height: 30px;
+    width: 100px;
+    border-radius: 5px;
+    margin: 0 auto;
+    margin-bottom: 25px;
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.5s, color 0.5s;
+  }
   
   .button:hover {
     background-color: #50C8FF;
