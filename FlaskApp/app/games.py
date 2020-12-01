@@ -8,80 +8,6 @@ import numpy as np
 
 GameState = namedtuple('GameState', 'to_move, utility, board, moves')
 
-
-# ______________________________________________________________________________
-# MinMax Search
-
-
-def minmax_decision(state, game):
-    """Given a state in a game, calculate the best move by searching
-    forward all the way to the terminal states. [Figure 5.3]"""
-
-    player = game.to_move(state)
-
-    def max_value(state):
-        if game.terminal_test(state):
-            return game.utility(state, player)
-        v = -np.inf
-        for a in game.actions(state):
-            v = max(v, min_value(game.result(state, a)))
-        return v
-
-    def min_value(state):
-        if game.terminal_test(state):
-            return game.utility(state, player)
-        v = np.inf
-        for a in game.actions(state):
-            v = min(v, max_value(game.result(state, a)))
-        return v
-
-    # Body of minmax_decision:
-    return max(game.actions(state), key=lambda a: min_value(game.result(state, a)))
-
-
-# ______________________________________________________________________________
-
-
-def expect_minmax(state, game):
-    """
-    [Figure 5.11]
-    Return the best move for a player after dice are thrown. The game tree
-	includes chance nodes along with min and max nodes.
-	"""
-    player = game.to_move(state)
-
-    def max_value(state):
-        v = -np.inf
-        for a in game.actions(state):
-            v = max(v, chance_node(state, a))
-        return v
-
-    def min_value(state):
-        v = np.inf
-        for a in game.actions(state):
-            v = min(v, chance_node(state, a))
-        return v
-
-    def chance_node(state, action):
-        res_state = game.result(state, action)
-        if game.terminal_test(res_state):
-            return game.utility(res_state, player)
-        sum_chances = 0
-        num_chances = len(game.chances(res_state))
-        for chance in game.chances(res_state):
-            res_state = game.outcome(res_state, chance)
-            util = 0
-            if res_state.to_move == player:
-                util = max_value(res_state)
-            else:
-                util = min_value(res_state)
-            sum_chances += util * game.probability(chance)
-        return sum_chances / num_chances
-
-    # Body of expect_minmax:
-    return max(game.actions(state), key=lambda a: chance_node(state, a), default=None)
-
-
 def alpha_beta_search(state, game):
     """Search game to determine best action; use alpha-beta pruning.
     As in [Figure 5.7], this version searches all the way to the leaves."""
@@ -128,18 +54,33 @@ def alpha_beta_search(state, game):
 
 #def calc_score_of_board(board,piece):
 
-def alpha_beta_cutoff_search(state, game, d=4, cutoff_test=None, eval_fn=None):
+# Player X is 1
+# player Y is 2
+def alpha_beta_cutoff_search(game, state, d=1, cutoff_test=None, eval_fn=None, board_as_array=None):
     """Search game to determine best action; use alpha-beta pruning.
     This version cuts off search and uses an evaluation function."""
 
-    player = game.to_move(state)
+    player = state.to_move
+
+    #for debugging
+    alpha_beta_cutoff_search.positions_analyzed = 0
+
+    alpha_beta_cutoff_search.board_copy = copy.deepcopy(board_as_array)
 
     # Functions used by alpha_beta
     def max_value(state, alpha, beta, depth):
         if cutoff_test(state, depth):
-            return eval_fn(state)
+            utility = game.utility(state, player)
+            return eval_fn(state,game,utility,alpha_beta_cutoff_search.board_copy)
         v = -np.inf
+
         for a in game.actions(state):
+            # mark board with value
+            alpha_beta_cutoff_search.board_copy = copy.deepcopy(board_as_array)        
+            alpha_beta_cutoff_search.board_copy[a[0]-1][a[1]-1] = 2
+            #print('trying:' + str(a) + 'board is now: ' + str(alpha_beta_cutoff_search.board_copy))
+
+            alpha_beta_cutoff_search.positions_analyzed +=  1 
             v = max(v, min_value(game.result(state, a), alpha, beta, depth + 1))
             if v >= beta:
                 return v
@@ -148,9 +89,18 @@ def alpha_beta_cutoff_search(state, game, d=4, cutoff_test=None, eval_fn=None):
 
     def min_value(state, alpha, beta, depth):
         if cutoff_test(state, depth):
-            return eval_fn(state)
+            utility = game.utility(state, player)
+            return eval_fn(state,game,utility,alpha_beta_cutoff_search.board_copy)
         v = np.inf
+
         for a in game.actions(state):
+
+            # mark board with value
+            alpha_beta_cutoff_search.board_copy = copy.deepcopy(board_as_array)         
+            alpha_beta_cutoff_search.board_copy[a[0]-1][a[1]-1] = 2
+            #print('trying:' + str(a) + 'board is now: ' + str(alpha_beta_cutoff_search.board_copy))
+
+            alpha_beta_cutoff_search.positions_analyzed +=1 
             v = min(v, max_value(game.result(state, a), alpha, beta, depth + 1))
             if v <= alpha:
                 return v
@@ -160,15 +110,18 @@ def alpha_beta_cutoff_search(state, game, d=4, cutoff_test=None, eval_fn=None):
     # Body of alpha_beta_cutoff_search starts here:
     # The default test cuts off at depth d or at a terminal state
     cutoff_test = (cutoff_test or (lambda state, depth: depth > d or game.terminal_test(state)))
-    eval_fn = eval_fn or (lambda state: game.utility(state, player))
+    eval_fn = eval_fn or (lambda state, game, utility, board: easy_mode(state,game,utility,board))
+    #eval_fn = eval_fn or (lambda state: game.utility(state, player))
     best_score = -np.inf
     beta = np.inf
     best_action = None
-    for a in game.actions(state):
+
+    for a in state.moves:
         v = min_value(game.result(state, a), best_score, beta, 1)
         if v > best_score:
             best_score = v
             best_action = a
+    print('considered: ' + str(alpha_beta_cutoff_search.positions_analyzed) + ' positions')
     return best_action
 
 
@@ -202,16 +155,8 @@ def random_player(game, state):
 def alpha_beta_player(game, state):
     return alpha_beta_search(state, game)
 
-def alpha_beta_cutoff_player(game, state):
-    return alpha_beta_cutoff_search(state, game)
-
-
-def minmax_player(game,state):
-    return minmax_decision(state,game)
-
-
-def expect_minmax_player(game, state):
-    return expect_minmax(state, game)
+def alpha_beta_cutoff_player(game, state,d=4,cutoff_test=None, eval_fn=None):
+    return alpha_beta_cutoff_search(game, state, d, cutoff_test, eval_fn, None)
 
 
 # ______________________________________________________________________________
@@ -273,27 +218,6 @@ class TicTacToe(Game):
     the form of a list of (x, y) positions, and a board, in the form of
     a dict of {(x, y): Player} entries, where Player is 'X' or 'O'."""
 
-    def getMoves(self,board):
-        moves = []
-        
-        taken_columns = []
-        # start at bottom row
-        i = 1
-        count = 0
-        row_depth = self.h
-        for row in reversed(board):
-            i=1
-            for el in row:
-                if(el == None and i not in taken_columns):
-                    moves.append((row_depth,i))
-                    taken_columns.append(i)
-                    count +=1
-                i += 1
-                if count>=7:
-                    return moves
-            row_depth -= 1
-                    
-        return moves
 
     def __init__(self, h=3, v=3, k=3):
         self.h = h
@@ -367,6 +291,191 @@ class ConnectFour(TicTacToe):
     def __init__(self, h=7, v=6, k=4):
         TicTacToe.__init__(self, h, v, k)
 
+        # number of possible connect fours at each position
+        # only works on 6X7 board
+        self.GaussianNormalDistribution = [[3, 4, 5, 7, 5, 4, 3], 
+                                          [4, 6, 8, 10, 8, 6, 4],
+                                          [5, 8, 11, 13, 11, 8, 5], 
+                                          [5, 8, 11, 13, 11, 8, 5],
+                                          [4, 6, 8, 10, 8, 6, 4],
+                                          [3, 4, 5, 7, 5, 4, 3]]
+    def getMoves(self,board):
+        moves = []
+        
+        taken_columns = []
+        # start at bottom row
+        i = 1
+        count = 0
+        row_depth = self.h
+        for row in reversed(board):
+            i=1
+            for el in row:
+                if(el == None and i not in taken_columns):
+                    moves.append((row_depth,i))
+                    taken_columns.append(i)
+                    count +=1
+                i += 1
+                if count>=7:
+                    return moves
+            row_depth -= 1
+                    
+        return moves
+
+    def result(self, state, move):
+        if move not in state.moves:
+            return state  # Illegal move has no effect
+        board = state.board.copy()
+        board[move] = state.to_move
+        moves = list(state.moves)
+        moves.remove(move)
+
+        # If the move was not the last one in the column, then the move above it becomes valid
+        # board rows are indexed from top to bottom ( 1 to n ) so a move at 0 triggers an overflow
+        if move[0] > 1:
+            moves.append((move[0]-1,move[1]))
+       
+        return GameState(to_move=('Y' if state.to_move == 'X' else 'X'),
+                         utility=self.compute_utility(board, move, state.to_move),
+                         board=board, moves=moves)
+
     def actions(self, state):
         return [(x, y) for (x, y) in state.moves
                 if x == self.h or (x + 1 , y ) in state.board]
+
+    # Convert 2d array into board with index and player
+    def convertArrayIntoBoard(self,board):
+        numpy_board = np.array(board)
+
+        # Find Xs and Y's
+        player_x = np.where(numpy_board == 1)
+        player_y = np.where(numpy_board == 2)
+        # tuple(arr[1,2,4], arr[0,2,1])
+
+        # Build state of board so that AI function can process it 
+        newBoard = {}
+        for x,y in zip(player_x[0],player_x[1]):
+            newBoard.update({(x+1,y+1) : 'X'})
+        for x,y in zip(player_y[0],player_y[1]):
+            newBoard.update({(x+1,y+1) : 'Y'})
+        print(newBoard)
+
+        return newBoard
+    
+    #player is 1 or 2, board is 2d array, consecutive is the number of tiles in a row 
+    def countConsecutiveTiles(self,board,player,consecutive):
+        board = board.copy()
+        count = 0
+
+        count += self.countVerticalTiles(board,consecutive,player)
+        count += self.countrHorizontalTiles(board,consecutive,player)
+
+        return count
+
+#-----------------------Board Scoring Counters----------------------
+# counting columns: 
+# columns have matching y values, and adjacent x values
+# h is the column number
+# v is the row number
+    def countVerticalTiles(self,board,windowSize,player):
+
+        lowerBound = 0
+        upperBound = windowSize-1
+        totalCount = 0
+        tempCount = 0
+        consecutiveTiles = 0
+
+        for y_index in range(0,self.h-1,1):
+            upperBound = windowSize-1
+            lowerBound = 0
+            for j in range(0,self.v-windowSize,1):
+                if board[lowerBound][y_index] == player and board[upperBound][y_index] == player:
+                    consecutiveTiles += 1
+                    tempCount = tempCount +  1 * consecutiveTiles * self.GaussianNormalDistribution[upperBound][y_index]                    
+                    upperBound += 1
+                    #print("found a Vertical Match")
+                else:
+                    totalCount += tempCount
+                    tempCount = 0
+                    consecutiveTiles = 0 
+                    lowerBound = upperBound
+                    upperBound = lowerBound + 1
+        return totalCount
+
+# Couting Rows:
+# Rows have matching x values and adjacent y
+# Rows are in the same list and have adjacent values
+    def countrHorizontalTiles(self,board,windowSize,player):
+
+        lowerBound = 0
+        upperBound = windowSize - 1 
+        consecutiveTiles = 0
+        totalCount = 0
+        tempCount = 0
+
+        for row in range(0,self.v-1,1):
+            upperBound = windowSize-1
+            lowerBound = 0
+            for j in range(0,self.h-windowSize,1):
+                if board[row][lowerBound] == player and board[row][upperBound] == player:
+                    consecutiveTiles += 1
+                    upperBound += 1
+                    tempCount = tempCount +  1 * consecutiveTiles * self.GaussianNormalDistribution[row][upperBound] 
+                    #print("found a Horizontal Match")
+                else:
+                    totalCount += tempCount
+                    tempCount = 0
+                    consecutiveTiles = 0 
+                    lowerBound = upperBound
+                    upperBound = lowerBound + 1
+        return totalCount                        
+
+#Counting Diagonals:
+# Diagonals have adjacent x and y values
+# Diagonals lay on adjacent lists (rows) with adjacent column indexes
+# the computer is the minimizing player trying to score the lowest sore
+
+# Iterate thrrough lists keep indexes 
+
+
+# the computer is denoted by player Y
+def random_eval(state,game,utility,board):
+    utility = check_utility(state,utility)
+    if utility is not None:
+        return utility
+    return random.randint(2,2000)
+
+
+# Example of input:
+# [[None, None, None, None, None, None, None], [None, None, None, None, None, None, None], [None, None, None, None, None, None, None],
+# [None, None, None, None, None, None, None], [2, None, 2, None, None, None, None], [1, None, 1, None, None, 1, None]]
+# Each array is  a row, the last array in the list is the bottom row
+
+
+def easy_mode(state, game, utility, board):
+    # Check for Winning Spot
+    utility = check_utility(state,utility)
+    if utility is not None:
+        return utility
+
+    # Score the Board
+    count = 0
+    count += game.countConsecutiveTiles(board,2,2)
+
+    # debugging
+    if count > 0:
+        print('\n=============\nMove made\n=============')
+        print('score: ' + str(count))
+
+    #Return Max or Min
+    if state.to_move == 'X':
+        return count 
+    else:
+        return count * -1
+
+def check_utility(state,utility):
+    # Check for Winning Spot
+    if utility == 1 and state.to_move == 'X':
+        return 1000000
+    if utility == -1 and state.to_move == 'Y':
+        return -1000000
+    return None

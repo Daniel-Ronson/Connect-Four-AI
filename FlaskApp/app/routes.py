@@ -3,7 +3,7 @@ from flask import request, jsonify
 from flask_api import status, exceptions
 from flask_cors import CORS, cross_origin
 import numpy as np
-
+import random
 
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -30,7 +30,7 @@ def test(data):
 # Game starts in react App board is initialized to null
 # React App passes in board data to this method
 # this method makes a move with the AI, updates the board state, and passes it back to react app
-# React APp updates board on the front end
+# React App updates board on the front end
 @app.route('/game',methods=['POST'])
 @cross_origin()
 def game():    
@@ -38,45 +38,31 @@ def game():
     parameters = json.loads(request.data)
     # parameters = {'board': '[[2,1,1,2,2,1,null],[1,2,1,1,2,2,null]] ..........'}
 
-    # Convert board into a list
+    # board into a 2d array
     board = parameters['board']
-    board = json.loads(board)
-    print(board)
+    board_as_array = json.loads(board)
+    print(board_as_array)
 
     # Create New Connect Four Game
     c4 = games.ConnectFour(6,7,4)
-    state = c4.initial
 
-    #get movelist
-    moves = c4.getMoves(board)
+    #get movelist from 2d array
+    moves = c4.getMoves(board_as_array)
 
-    #Convert board to readable state for AI algorithm
-    numpy_board = np.array(board)
-
-    # Find Xs and Y's
-    player_x = np.where(numpy_board == 1)
-    player_y = np.where(numpy_board == 2)
-    # tuple(arr[1,2,4], arr[0,2,1])
-
-    # Build state of board so that AI function can process it 
-    newBoard = {}
-    for x,y in zip(player_x[0],player_x[1]):
-        newBoard.update({(x+1,y+1) : 'X'})
-    for x,y in zip(player_y[0],player_y[1]):
-        newBoard.update({(x+1,y+1) : 'Y'})
-    print(newBoard)
-
-    # set board 
+    #Convert board to readable state for AI algorithm,a dict
+    newBoard =c4.convertArrayIntoBoard(board_as_array)
 
     initialState = games.GameState(to_move=('Y'),
                          utility=0,  board=newBoard, moves=moves)
 
-    move = games.alpha_beta_cutoff_player(c4, initialState)
-
+                 #alpha_beta_cutoff_search(state, game, d=1, cutoff_test=None, eval_fn=None,2dArray):
+    move = games.alpha_beta_cutoff_search(c4,initialState,2,None,None,board_as_array)
+    print('actions: ' + str(c4.actions(initialState)))
     print(moves)
     print(move)
 
-    response  =  json.dumps({'row':move[0]-1,'column':move[1]-1})
-    return response, status.HTTP_200_OK
-
-
+    try:
+        response  =  json.dumps({'row':move[0]-1,'column':move[1]-1})
+        return response, status.HTTP_200_OK
+    except:
+        return "error", status.HTTP_500_INTERNAL_SERVER_ERROR

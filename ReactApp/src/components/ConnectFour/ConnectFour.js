@@ -68,9 +68,9 @@ class ConnectFour extends React.Component {
       return new Promise(resolve => {
       let result = this.checkAll(board);
       if (result === this.state.player1) {
-        this.setState({ board, gameOver: true, message: 'Player 1 (red) wins!' }, () => resolve());
+        this.setState({ board, gameOver: true, message: 'Red player wins!' }, () => resolve());
       } else if (result === this.state.player2) {
-        this.setState({ board, gameOver: true, message: 'Player 2 (yellow) wins!' }, () => resolve());
+        this.setState({ board, gameOver: true, message: 'Yellow player wins!' }, () => resolve());
       } else if (result === 'draw') {
         this.setState({ board, gameOver: true, message: 'Draw game.' }, () => resolve());
       } 
