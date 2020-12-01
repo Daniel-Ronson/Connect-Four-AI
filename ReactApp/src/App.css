@@ -3,6 +3,7 @@
   --gray-one: #e8e8e8;
   --gray-two: #bbbfca;
   --gray-three: #495464;
+  --cool-blue: #8fb0e9;
 }
 .navbar-app{
   background-color: var(--gray-two);
@@ -13,7 +14,7 @@
 
 .App {
   text-align: center;
-  background-color: var(--gray-one);
+  background-color: var(--cool-blue);
 }
 
 .App-logo {
