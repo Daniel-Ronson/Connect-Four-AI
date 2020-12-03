@@ -35,6 +35,7 @@ function App() {
     <div className="App">
       <Navbar className="navbar-app"></Navbar>
       <Container fluid className="mt-5 pb-3 pt-5">
+        <Row>      <PlayerChoice/>    </Row>
         <Row>
           <Col><ConnectFour className="mt-5 marginTop"></ConnectFour></Col>
           <Col><Messaging/></Col>
@@ -44,5 +45,8 @@ function App() {
     </AppProvider>
   );
 }
+
+
+
 
 export default App;
