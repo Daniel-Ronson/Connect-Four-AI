@@ -8,6 +8,7 @@ body {
   }
   
   table {
+    /* margin: 0 0 0 450px; */
     margin: 0 auto;
     border-spacing: 0px 0px;
   }
@@ -28,14 +29,15 @@ body {
     cursor: pointer;
     transition: background-color 0.5s, color 0.5s;
   }
-  .button1 {
+  .shuffleButton {
     background-color: #303030;
     color: #ff9050;
     height: 30px;
     width: 100px;
-    border-radius: 5px;
+    border-radius: 50px;
     margin: 0 auto;
-    margin-bottom: 25px;
+    margin-top: 20px;
+    margin-bottom: 10px;
     text-align: center;
     display: flex;
     flex-direction: row;
