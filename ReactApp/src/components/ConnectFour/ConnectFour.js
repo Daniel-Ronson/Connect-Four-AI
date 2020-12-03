@@ -2,7 +2,7 @@ import './ConnectFour.css'
 import React from 'react';
 import {postBoardState} from '../../Requests/ConnectFourRequest'
 class ConnectFour extends React.Component {
-    constructor(props) {
+    constructor(props) { 
       super(props);
       
       this.state = {
@@ -46,7 +46,8 @@ class ConnectFour extends React.Component {
         currentPlayer: this.state.player1,
         gameOver: false,
         message: '',
-        winningCoordinates: []
+        winningCoordinates: [],
+        shuffledUsed: false
       });
     }
     
@@ -228,14 +229,15 @@ class ConnectFour extends React.Component {
       let board = [...this.state.board]; //2d array tracking player moves
       let winningCoordinates = [...this.state.winningCoordinates] //2d array containing tuples of coordinates
       let button
-      let button1
+      let shuffleButton
 
       if(this.state.gameOver === false && this.state.shuffledUsed == false){
-        button1 = <div className="button1" onClick={() => {this.shuffleBoard()}}>Shuffle</div>          
+        shuffleButton = <div className="shuffleButton" onClick={() => {this.shuffleBoard()}}>Shuffle</div>          
+        
       }
 
       if(this.state.gameOver === true){
-        button = <div className="button" onClick={() => {this.initBoard()}}>New Game</div>          
+        button = <div className="button" onClick={() => {this.initBoard()}}>New Game</div>
       }
       else{
         button = <div>Game in Progress</div>
@@ -245,14 +247,14 @@ class ConnectFour extends React.Component {
       return (
         <div>
           {button}
-          {button1}        
-          <table>
+          <table> 
             <thead>
             </thead>
             <tbody>
               {board.map((row, i) => (<Column index = {index++} key={i} row={row} play={this.play} winningCoordinates = {winningCoordinates}/>))}
             </tbody>
           </table>
+          {shuffleButton}
           
           <p className="message">{this.state.message}</p>
         </div>
