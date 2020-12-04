@@ -1,6 +1,7 @@
 import './ConnectFour.css'
 import React from 'react';
 import {postBoardState} from '../../Requests/ConnectFourRequest'
+import AppContext from '../../AppContext'
 class ConnectFour extends React.Component {
     constructor(props) { 
       super(props);
@@ -14,6 +15,7 @@ class ConnectFour extends React.Component {
         gameOver: false,
         message: '',
         gameType: 'singlePlayer',
+        gameDifficulty: 'easy',
         winningCoordinates: []
       };
       
@@ -79,9 +81,8 @@ class ConnectFour extends React.Component {
       } 
     })
   }
-    async play(c) {
-
-      if (!this.state.gameOver) {
+    async play(gameType,gameDifficulty,c) {
+      if (!this.state.gameOver && gameType != null) {
 
         // Place piece on board
         let board = this.state.board;
@@ -105,15 +106,16 @@ class ConnectFour extends React.Component {
           this.setState({ board, currentPlayer: toggle_player });  
 
           // Call AI algorithm if Single Player game
-          if(this.state.gameType === 'singlePlayer' && toggle_player === this.state.player2){
-            let ai_move_column = await postBoardState(board)  // Make call to AI algorithm
+          if(gameType === 'singlePlayer' && toggle_player === this.state.player2){
+            console.log(gameDifficulty)
+            let ai_move_column = await postBoardState(board,gameDifficulty)  // Make call to AI algorithm
             board = this.makeMove(ai_move_column,board,toggle_player)
             this.setState({ board, currentPlayer: this.state.player1});
             await this.checkBoard(this.state.board)
           }
 
         }
-      } else {
+      } else if(this.state.gameOver == true) {
         this.setState({ message: 'Please start a new game.' });
       }
 
@@ -293,11 +295,15 @@ class ConnectFour extends React.Component {
     }
      
     return (
+      <AppContext.Consumer>
+      {(context) => (
       <td>
-        <div className="cell" onClick={() => {play(columnIndex)}}>
+        <div className="cell" onClick={() => {play(context.state.gameType, context.state.gameMode, columnIndex)}}>
           <div className= {`square ${color}`} ></div>
         </div>
       </td>
+      )}
+      </AppContext.Consumer>
     );
   };
   
