@@ -462,9 +462,9 @@ def easy_mode(state, game, utility, board):
     count += game.countConsecutiveTiles(board,2,2)
 
     # debugging
-    if count > 0:
-        print('\n=============\nMove made\n=============')
-        print('score: ' + str(count))
+    # if count > 0:
+    #     print('\n=============\nMove made\n=============')
+    #     print('score: ' + str(count))
 
     #Return Max or Min
     if state.to_move == 'X':
