@@ -4,10 +4,13 @@
   --gray-two: #bbbfca;
   --gray-three: #495464;
   --cool-blue: #8fb0e9;
+  --cool-blue-two: #5e8ddd;
 }
-.navbar-app{
-  background-color: var(--gray-two);
+
+h2{
+  color: black;
 }
+
 .container-app{
   background-color: var(--gray-two);
 }
@@ -20,14 +23,6 @@
 .App-logo {
   height: 40vmin;
   pointer-events: none;
-}
-
-
-.marginBottom{
-  margin-bottom: 20px;
-}
-.marginTop{
-  margin-top: 20px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -51,11 +46,6 @@
   color: #61dafb;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+body {
+  background-color: var(--gray-one);
 }

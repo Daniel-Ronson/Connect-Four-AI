@@ -34,7 +34,7 @@ function MyNav() {
   const [user] = useAuthState(auth);
     return (
       <div>
-        <Navbar bg="dark" variant="dark">
+        <Navbar className = "navbar-app">
 
         <Navbar.Brand href="#home">
           <img

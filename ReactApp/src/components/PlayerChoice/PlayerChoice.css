@@ -1,32 +1,58 @@
 
-body {
-    font-family: 'Lucida Sans Unicode';
-  }
-  
-  h1 {
-    text-align: center;
-    font-size: 50px;
-  }
-
 .controlPanel {
     color: #50C8FF;
-    height: 30px;
-    width: 100px;
     border-radius: 100%;
     margin: 0 auto;
-    margin-bottom: 50px;
-    margin-top: 25px;
+    margin-top: 5px;
     text-align: center;
     display: flex;
-    flex-direction: row;
+    flex-flow: row wrap;
     justify-content: center;
     align-items: center;
     cursor: pointer;
     transition: background-color 0.5s, color 0.5s;
   }
 
-
-  .controlPanelButton:focus{
-    background-color: rgb(183, 243, 124);
-    color: black;
+  @media all and (max-width:600px) {
+    .controlPanel{
+      flex-flow: column wrap;
+      padding: 0;
+    }
+    .aside-2{
+      padding:10px 0 10px;
+    }
   }
+
+.background-green{
+  background-color: rgb(95, 190, 0);
+  color: black;
+}
+
+.background-pink{
+  background-color: rgb(231, 95, 213);
+  color: black;
+}
+
+.background-gray{
+    color: white;
+    background-color: rgb(129, 127, 128);
+  }
+
+  .controlPanelButton {
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 10px;
+    border-radius: 40px;
+    border: none;
+    transition: all 0.4s ease 0s;
+    font: Arial
+    }
+
+    .controlPanelButton:focus{
+      outline: 0;
+    }
+    .controlPanelButton:hover {
+      outline: 0;
+      text-shadow: 0px 0px 6px rgba(255, 255, 255, 1);
+      transition: all 0.4s ease 0s;
+      }
