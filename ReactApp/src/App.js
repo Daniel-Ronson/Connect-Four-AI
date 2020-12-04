@@ -4,15 +4,14 @@ import AppContext from './AppContext'
 
 import ConnectFour from './components/ConnectFour/ConnectFour'
 //import ConnectFour from './components/ConnectFour/Online'
-import Messaging from './components/Messages/Messaging'
 import PlayerChoice from './components/PlayerChoice/PlayerChoice'
 import Navbar from './components/Navbar'
 import {Container, Col, Row} from 'react-bootstrap';
-
 class AppProvider extends Component {
   state = {
     gameType: 'singlePlayer',
-    gameMode: 'easy'
+    gameMode: 'easy',
+    experimentalFlag: false,
   }
 
   render() {
@@ -24,11 +23,15 @@ class AppProvider extends Component {
         }),
         setGameDifficulty: (mode) => this.setState({
           gameMode: mode
+        }),
+        setExperimentalFlag: () => this.setState({
+          experimentalFlag: this.state.experimentalFlag == false ? true : false
         })
       }}>
         {this.props.children}
         {console.log('game type: ' + this.state.gameType)}
         {console.log('difficulty: ' + this.state.gameMode)}
+        {console.log('experimental: ' + this.state.experimentalFlag + ' ' + typeof this.state.experimentalFlag)}
       </AppContext.Provider>
     )
   }
@@ -39,10 +42,10 @@ function App(){
 
   return (
     <AppProvider>
-    <div className="App">
-      <Navbar className="navbar-app"></Navbar>
+      <Navbar></Navbar>
+      <PlayerChoice ></PlayerChoice>
+    <div className="App mt-3">
       <Container fluid className="">
-        <Row>      <PlayerChoice/>    </Row>
         <Row>
           <Col><ConnectFour className="mt-5 marginTop"></ConnectFour></Col>
         </Row>

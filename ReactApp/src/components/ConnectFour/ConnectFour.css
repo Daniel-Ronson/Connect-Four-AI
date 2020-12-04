@@ -8,13 +8,8 @@ body {
     font-size: 50px;
   }
   
-  table {
-    /* margin: 0 0 0 450px; */
-    margin: 0 auto;
-    border-spacing: 0px 0px;
-  }
-  
-  .button {
+
+  .newGameButton {
     background-color: #303030;
     color: #50C8FF;
     height: 30px;
@@ -54,6 +49,13 @@ body {
     transition: background-color 0.5s, color 0.5s;
   }
   
+  .gameBoard {
+    /* margin: 0 0 0 450px; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .cell {
     background: #fff;
     border: 1px solid #999;
@@ -71,6 +73,13 @@ body {
     height: 70px;
     width: 70px;  
     cursor: pointer;
+}
+
+@media all and (max-width:600px) {
+  .cell{
+    height: 40px;
+    width: 40px; 
+  }
 }
 
 .square {

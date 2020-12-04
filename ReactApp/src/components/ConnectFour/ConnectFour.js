@@ -161,6 +161,7 @@ class ConnectFour extends React.Component {
             if (board[r][c] === board[r - 1][c + 1] &&
                 board[r][c] === board[r - 2][c + 2] &&
                 board[r][c] === board[r - 3][c + 3]) {
+                  this.setCoordinates([[r,c],[r-1,c+1],[r-2,c+2],[r-3,c+3]])
               return board[r][c];
             }
           }
@@ -176,6 +177,7 @@ class ConnectFour extends React.Component {
             if (board[r][c] === board[r - 1][c - 1] &&
                 board[r][c] === board[r - 2][c - 2] &&
                 board[r][c] === board[r - 3][c - 3]) {
+                this.setCoordinates([[r,c],[r-1,c-1],[r-2,c-2],[r-3,c-3]])
               return board[r][c];
             }
           }
@@ -239,7 +241,7 @@ class ConnectFour extends React.Component {
       }
 
       if(this.state.gameOver === true){
-        button = <div className="button" onClick={() => {this.initBoard()}}>New Game</div>
+        button = <div className="newGameButton" onClick={() => {this.initBoard()}}>New Game</div>
       }
       else{
         button = <div>Game in Progress</div>
@@ -247,19 +249,22 @@ class ConnectFour extends React.Component {
 
       let index = 0
       return (
+        <AppContext.Consumer>
+        {(context) => (
         <div>
           {button}
-          <table> 
+          <table className="gameBoard"> 
             <thead>
             </thead>
             <tbody>
               {board.map((row, i) => (<Column index = {index++} key={i} row={row} play={this.play} winningCoordinates = {winningCoordinates}/>))}
             </tbody>
           </table>
-          {shuffleButton}
-          
+          {(context.state.experimentalFlag == true) && shuffleButton }
           <p className="message">{this.state.message}</p>
         </div>
+        )}
+        </AppContext.Consumer>
       );
     }
   }

@@ -1,12 +1,7 @@
-import React, { Component } from 'react';
+import React from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
-import { setState, useEffect, useState } from "react";
 import './PlayerChoice.css'
-import ToggleButton from 'react-bootstrap/Button';
-import ButtonGroup from 'react-bootstrap/Button';
-import Button from 'react-bootstrap/Button'
-import DropdownButton from 'react-bootstrap/DropdownButton';
-import Dropdown from 'react-bootstrap/Dropdown'
+import {Dropdown} from 'react-bootstrap';
 import AppContext from '../../AppContext'
 
 
@@ -27,22 +22,28 @@ class PlayerChoice extends React.Component{
     render(){ return(
     <AppContext.Consumer>
         {(context) => (
-        <div className = 'controlPanel'>
-            <Dropdown  onClick={e => context.setGameType('singlePlayer')} variant="secondary" className="mr-2"> 
-            <Dropdown.Toggle>Single Player</Dropdown.Toggle>
-          
-            <Dropdown.Menu>
-              <Dropdown.Item onClick={e => context.setGameDifficulty('easy')}>Easy</Dropdown.Item>
-              <Dropdown.Item onClick={e => context.setGameDifficulty('medium')}>Medium</Dropdown.Item>
-              <Dropdown.Item onClick={e => context.setGameDifficulty('hard')}>Hard</Dropdown.Item>
-            </Dropdown.Menu>
-        </Dropdown>
-
-        <Button className="mr-2 controlPanelButton" variant="secondary" value= "multiplayer" onClick={e => context.setGameType(e.target.value)}>
-            Multiplayer
-        </Button>
-        <Button className="controlPanelButton" variant="secondary"  value= "experimental" onClick={e => context.setGameType(e.target.value)}>Experimental</Button>
-
+        <div className = "controlPanel">
+            <div className="">
+            <Dropdown className="background-green" onClick={e => context.setGameType('singlePlayer')} variant="secondary" className="mr-2"> 
+                    <Dropdown.Toggle>Single Player</Dropdown.Toggle>
+                
+                    <Dropdown.Menu>
+                    <Dropdown.Item onClick={e => context.setGameDifficulty('easy')}>Easy</Dropdown.Item>
+                    <Dropdown.Item onClick={e => context.setGameDifficulty('medium')}>Medium</Dropdown.Item>
+                    <Dropdown.Item onClick={e => context.setGameDifficulty('hard')}>Hard</Dropdown.Item>
+                    </Dropdown.Menu>
+                </Dropdown>
+            </div>
+            <div className="aside-2">
+            <button className={`controlPanelButton mr-2 ${context.state.gameType == 'multiPlayer' ? 'background-pink' : 'background-gray'}`} value= "multiPlayer" onClick={e => context.setGameType(e.target.value)}>
+                    Multiplayer
+                </button>
+            </div>
+            <div className="aside-3">
+            <button className={`controlPanelButton ${context.state.experimentalFlag == true ? 'background-green' : 'background-gray'}`} value= "true" 
+                onClick={context.setExperimentalFlag}>  Experimental</button>     
+            </div>
+           
         </div>
     )}
     </AppContext.Consumer>
