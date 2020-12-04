@@ -1,9 +1,8 @@
 import './ConnectFour.css'
 import React from 'react';
 import {postBoardState} from '../../Requests/ConnectFourRequest'
-import AppContext from '../../AppContext'
 class ConnectFour extends React.Component {
-    constructor(props) { 
+    constructor(props) {
       super(props);
       
       this.state = {
@@ -15,7 +14,6 @@ class ConnectFour extends React.Component {
         gameOver: false,
         message: '',
         gameType: 'singlePlayer',
-        gameDifficulty: 'easy',
         winningCoordinates: []
       };
       
@@ -48,8 +46,7 @@ class ConnectFour extends React.Component {
         currentPlayer: this.state.player1,
         gameOver: false,
         message: '',
-        winningCoordinates: [],
-        shuffledUsed: false
+        winningCoordinates: []
       });
     }
     
@@ -81,8 +78,9 @@ class ConnectFour extends React.Component {
       } 
     })
   }
-    async play(gameType,gameDifficulty,c) {
-      if (!this.state.gameOver && gameType != null) {
+    async play(c) {
+
+      if (!this.state.gameOver) {
 
         // Place piece on board
         let board = this.state.board;
@@ -106,16 +104,15 @@ class ConnectFour extends React.Component {
           this.setState({ board, currentPlayer: toggle_player });  
 
           // Call AI algorithm if Single Player game
-          if(gameType === 'singlePlayer' && toggle_player === this.state.player2){
-            console.log(gameDifficulty)
-            let ai_move_column = await postBoardState(board,gameDifficulty)  // Make call to AI algorithm
+          if(this.state.gameType === 'singlePlayer' && toggle_player === this.state.player2){
+            let ai_move_column = await postBoardState(board)  // Make call to AI algorithm
             board = this.makeMove(ai_move_column,board,toggle_player)
             this.setState({ board, currentPlayer: this.state.player1});
             await this.checkBoard(this.state.board)
           }
 
         }
-      } else if(this.state.gameOver == true) {
+      } else {
         this.setState({ message: 'Please start a new game.' });
       }
 
@@ -231,15 +228,14 @@ class ConnectFour extends React.Component {
       let board = [...this.state.board]; //2d array tracking player moves
       let winningCoordinates = [...this.state.winningCoordinates] //2d array containing tuples of coordinates
       let button
-      let shuffleButton
+      let button1
 
       if(this.state.gameOver === false && this.state.shuffledUsed == false){
-        shuffleButton = <div className="shuffleButton" onClick={() => {this.shuffleBoard()}}>Shuffle</div>          
-        
+        button1 = <div className="button1" onClick={() => {this.shuffleBoard()}}>Shuffle</div>          
       }
 
       if(this.state.gameOver === true){
-        button = <div className="button" onClick={() => {this.initBoard()}}>New Game</div>
+        button = <div className="button" onClick={() => {this.initBoard()}}>New Game</div>          
       }
       else{
         button = <div>Game in Progress</div>
@@ -249,14 +245,14 @@ class ConnectFour extends React.Component {
       return (
         <div>
           {button}
-          <table> 
+          {button1}        
+          <table>
             <thead>
             </thead>
             <tbody>
               {board.map((row, i) => (<Column index = {index++} key={i} row={row} play={this.play} winningCoordinates = {winningCoordinates}/>))}
             </tbody>
           </table>
-          {shuffleButton}
           
           <p className="message">{this.state.message}</p>
         </div>
@@ -295,15 +291,11 @@ class ConnectFour extends React.Component {
     }
      
     return (
-      <AppContext.Consumer>
-      {(context) => (
       <td>
-        <div className="cell" onClick={() => {play(context.state.gameType, context.state.gameMode, columnIndex)}}>
+        <div className="cell" onClick={() => {play(columnIndex)}}>
           <div className= {`square ${color}`} ></div>
         </div>
       </td>
-      )}
-      </AppContext.Consumer>
     );
   };
   

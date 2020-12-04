@@ -5,10 +5,11 @@ let baseUrl = 'http://127.0.0.1:5000/'
 // Input: Current State of board
 // Output: New state of board after AI makes a move
 
-export const postBoardState = async (board) =>{
+export const postBoardState = async (board, gameDifficulty) =>{
     let boardJson = JSON.stringify(board)
     let response  = await axios.post(`${baseUrl}/game`, {
-                               board: boardJson
+                               board: boardJson,
+                               mode: gameDifficulty
                             })
 
         // response.data = {row:6, column:2}

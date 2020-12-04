@@ -1,6 +1,7 @@
 in the folder containing the folder which holds the flask app run the  commands using windows
 
 `python -m venv env1`  *creates new virtual environment
+`pip install -r requirements.txt`
 `env1\Scripts\activate`  *Starts running virtual environment
 
 File Structure:

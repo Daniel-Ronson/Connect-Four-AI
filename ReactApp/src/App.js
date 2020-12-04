@@ -1,24 +1,57 @@
-import './App.css';
+import './App.css'
+import React, { Component } from 'react';
+import AppContext from './AppContext'
+
 import ConnectFour from './components/ConnectFour/ConnectFour'
-import Navbar from './components/Navbar'
+//import ConnectFour from './components/ConnectFour/Online'
+import Messaging from './components/Messages/Messaging'
 import PlayerChoice from './components/PlayerChoice/PlayerChoice'
-import {Container} from 'react-bootstrap';
+import Navbar from './components/Navbar'
+import {Container, Col, Row} from 'react-bootstrap';
+
+class AppProvider extends Component {
+  state = {
+    gameType: 'singlePlayer',
+    gameMode: 'easy'
+  }
+
+  render() {
+    return (
+      <AppContext.Provider value={{
+        state: this.state,
+        setGameType: (game) => this.setState({
+          gameType: game
+        }),
+        setGameDifficulty: (mode) => this.setState({
+          gameMode: mode
+        })
+      }}>
+        {this.props.children}
+        {console.log('game type: ' + this.state.gameType)}
+        {console.log('difficulty: ' + this.state.gameMode)}
+      </AppContext.Provider>
+    )
+  }
+}
 
 
-function App() {
+function App(){
+
   return (
-    <div className="App"> 
+    <AppProvider>
+    <div className="App">
       <Navbar className="navbar-app"></Navbar>
-      <PlayerChoice/>
-      <ConnectFour className="mt-5"></ConnectFour>
-      {/* <Container className=" mt-5 pb-3 pt-5">
-        <ConnectFour className="mt-5 marginTop"></ConnectFour>
-      </Container> */}
-      
-
+      <Container fluid className="">
+        <Row>      <PlayerChoice/>    </Row>
+        <Row>
+          <Col><ConnectFour className="mt-5 marginTop"></ConnectFour></Col>
+        </Row>
+      </Container>
     </div>
+    </AppProvider>
   );
 }
+
 
 
 

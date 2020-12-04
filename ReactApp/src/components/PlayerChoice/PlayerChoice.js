@@ -7,6 +7,7 @@ import ButtonGroup from 'react-bootstrap/Button';
 import Button from 'react-bootstrap/Button'
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown'
+import AppContext from '../../AppContext'
 
 
 class PlayerChoice extends React.Component{
@@ -22,40 +23,30 @@ class PlayerChoice extends React.Component{
             experimental: false
         };
     }
-    
-    singplePlayerOptions()
-    {
-        this.setState({singlePlayer: true})
-        
-    }
 
-    render(){
-
-        let options
-
-
-        options = 
-        <ButtonGroup className = 'singlePlayer'>
-            <Dropdown > 
+    render(){ return(
+    <AppContext.Consumer>
+        {(context) => (
+        <div className = 'controlPanel'>
+            <Dropdown  onClick={e => context.setGameType('singlePlayer')} variant="secondary" className="mr-2"> 
             <Dropdown.Toggle>Single Player</Dropdown.Toggle>
           
             <Dropdown.Menu>
-              <Dropdown.Item href="/easy">Easy</Dropdown.Item>
-              <Dropdown.Item href="/medium">Medium</Dropdown.Item>
-              <Dropdown.Item href="/hard">Hard</Dropdown.Item>
+              <Dropdown.Item onClick={e => context.setGameDifficulty('easy')}>Easy</Dropdown.Item>
+              <Dropdown.Item onClick={e => context.setGameDifficulty('medium')}>Medium</Dropdown.Item>
+              <Dropdown.Item onClick={e => context.setGameDifficulty('hard')}>Hard</Dropdown.Item>
             </Dropdown.Menu>
         </Dropdown>
-        <Button href="multi">Multiplayer</Button>
-        <Button href="experimental">Experimental</Button>
-        </ButtonGroup>
 
+        <Button className="mr-2 controlPanelButton" variant="secondary" value= "multiplayer" onClick={e => context.setGameType(e.target.value)}>
+            Multiplayer
+        </Button>
+        <Button className="controlPanelButton" variant="secondary"  value= "experimental" onClick={e => context.setGameType(e.target.value)}>Experimental</Button>
 
-        return(
-            <>              
-                {options}                           
-            </>
-
-        )
+        </div>
+    )}
+    </AppContext.Consumer>
+    )
     }
         
 }
