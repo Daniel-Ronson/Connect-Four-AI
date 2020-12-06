@@ -6,7 +6,9 @@ import '../App.css'
 
 import firebase from '../Firebase/Firebase' 
 import { useAuthState } from 'react-firebase-hooks/auth';
-import CreateOnlineGame from './CreateOnlineGame'
+import CreateOnlineGame from './OnlineGame/CreateOnlineGame'
+import JoinGame from './OnlineGame/JoinGame'
+
 const auth = firebase.auth();
 
 function SignIn() {
@@ -16,17 +18,26 @@ function SignIn() {
     auth.signInWithPopup(provider);
   }
 
+  const SignInAnonymous = () => {
+    firebase.app().auth().signInAnonymously();
+  }
+
   return (
     <>
-      <Button variant="outline-success" className="sign-in" onClick={signInWithGoogle}>Sign in with Google</Button>
+      <Button variant="outline-success" className="sign-in" onClick={SignInAnonymous}>Play Online</Button>
     </>
   )
 }
 
 function SignOut() {
-   const [user] = useAuthState(auth);
   return auth.currentUser &&(
-    <Button variant="outline-success" className="sign-out" onClick={() => auth.signOut()}>Sign Out</Button>
+    <Button variant="outline-success" className="sign-out" onClick={() => auth.signOut()}>Play Offline</Button>
+  )
+}
+
+function GoOnlineButton(){
+  return(
+    <button>Go Online</button>
   )
 }
 
@@ -48,10 +59,10 @@ function MyNav() {
         </Navbar.Brand>
 
         <Nav>
-         <Nav.Link> {user ?<CreateOnlineGame/> :  <SignIn/> }  </Nav.Link>
+         <Nav.Link> {user ?<React.Fragment/> :  <SignIn/> }  </Nav.Link>
         </Nav>
 
-        <Nav container-fluid className="ml-auto" >
+        <Nav>
          <Nav.Link>   <SignOut/>   </Nav.Link>
         </Nav>  
     
