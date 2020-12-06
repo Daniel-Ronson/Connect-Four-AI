@@ -1,8 +1,26 @@
 import './ConnectFour.css'
-import React from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {postBoardState} from '../../Requests/ConnectFourRequest'
+import {GetOnlineGame} from '../../Firebase/GetOnlineGame'
 import AppContext from '../../AppContext'
+
+import firebase from '../../Firebase/Firebase' 
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { useCollectionData } from 'react-firebase-hooks/firestore';
+const auth = firebase.auth();
+const firestore = firebase.firestore();
+
+
 class ConnectFour extends React.Component {
+//    uid  = auth.currentUser;
+//    dummy = useRef();
+//    messagesRef = firestore.collection('messages');
+//  // const query = messagesRef.where('uid','==',uid).limit(5)
+  // query = messagesRef.orderBy('createdAt').equalTo()
+////  const query = messagesRef.orderByChild('uid').equalTo(uid).limitToLast(5);
+
+//   [messages] = useCollectionData(query, { idField: 'id' });
+
     constructor(props) { 
       super(props);
       
@@ -81,8 +99,11 @@ class ConnectFour extends React.Component {
       } 
     })
   }
-    async play(gameType,gameDifficulty,c) {
-      if (!this.state.gameOver && gameType != null) {
+  
+    async play(gameType,gameDifficulty,c, gameCode, gameJoined) {
+
+      // Single Player or Online Game
+      if (!this.state.gameOver && ( (gameType == 'singlePlayer' && this.state.currentPlayer === 1) || (gameType === 'multiPlayer') || (gameType === 'onlineGame' && gameJoined===true))) {
 
         // Place piece on board
         let board = this.state.board;
@@ -91,9 +112,9 @@ class ConnectFour extends React.Component {
         // Check status of board
         let result = this.checkAll(board);
         if (result === this.state.player1) {
-          this.setState({ board, gameOver: true, message: 'Player 1 (red) wins!' });
+          this.setState({ board, gameOver: true, message: 'Red Player wins!' });
         } else if (result === this.state.player2) {
-          this.setState({ board, gameOver: true, message: 'Player 2 (yellow) wins!' });
+          this.setState({ board, gameOver: true, message: 'Yellow Player wins!' });
         } else if (result === 'draw') {
           this.setState({ board, gameOver: true, message: 'Draw game.' });
         } 
@@ -114,13 +135,18 @@ class ConnectFour extends React.Component {
             await this.checkBoard(this.state.board)
           }
 
+          // Online Game
+          else if (gameType === "onlineGame"){
+            await this.props.updateGameOnline(JSON.stringify(this.state.board))
+          }
+
         }
       } else if(this.state.gameOver == true) {
         this.setState({ message: 'Please start a new game.' });
       }
 
     }
-    
+
      checkVertical(board) {
       // Check only if row is 3 or greater
       for (let r = 3; r < 6; r++) {
@@ -230,29 +256,23 @@ class ConnectFour extends React.Component {
     }
     
     render() {
+      //console.log(this.props.games)
       let board = [...this.state.board]; //2d array tracking player moves
       let winningCoordinates = [...this.state.winningCoordinates] //2d array containing tuples of coordinates
       let button
       let shuffleButton
-
       if(this.state.gameOver === false && this.state.shuffledUsed == false){
         shuffleButton = <div className="shuffleButton" onClick={() => {this.shuffleBoard()}}>Shuffle</div>          
         
-      }
-
-      if(this.state.gameOver === true){
-        button = <div className="newGameButton" onClick={() => {this.initBoard()}}>New Game</div>
-      }
-      else{
-        button = <div>Game in Progress</div>
-      }
-
+      }     
+      button = <div className="newGameButton" onClick={() => {this.initBoard()}}>New Game</div>
       let index = 0
+
       return (
         <AppContext.Consumer>
         {(context) => (
         <div>
-          {button}
+          <div className="pt-3">{button}</div>
           <table className="gameBoard"> 
             <thead>
             </thead>
@@ -303,9 +323,17 @@ class ConnectFour extends React.Component {
       <AppContext.Consumer>
       {(context) => (
       <td>
-        <div className="cell" onClick={() => {play(context.state.gameType, context.state.gameMode, columnIndex)}}>
-          <div className= {`square ${color}`} ></div>
+        {
+          // context.state.gameType == "onlineGame" && 
+          // <div className="cell" onClick={() => {onlinePlay(context.state.gameType, context.state.gameMode, columnIndex, context.state.gameCode, context.state.onlineGameJoined)}}>
+          //   <div className= {`square ${color}`} ></div>
+          // </div>
+        }
+      
+        <div className="cell" onClick={() => {play(context.state.gameType, context.state.gameMode, columnIndex, context.state.gameCode, context.state.onlineGameJoined)}}>
+            <div className= {`square ${color}`} ></div>
         </div>
+  
       </td>
       )}
       </AppContext.Consumer>

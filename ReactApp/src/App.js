@@ -1,58 +1,46 @@
 import './App.css'
-import React, { Component } from 'react';
+import React, { Component, useContext } from 'react';
 import AppContext from './AppContext'
 
 import ConnectFour from './components/ConnectFour/ConnectFour'
+import OnlineGame from './components/ConnectFour/Online'
 //import ConnectFour from './components/ConnectFour/Online'
 import PlayerChoice from './components/PlayerChoice/PlayerChoice'
 import Navbar from './components/Navbar'
 import {Container, Col, Row} from 'react-bootstrap';
-class AppProvider extends Component {
-  state = {
-    gameType: 'singlePlayer',
-    gameMode: 'easy',
-    experimentalFlag: false,
-  }
+import firebase from './Firebase/Firebase' 
+import { useAuthState } from 'react-firebase-hooks/auth';
+import JoinGame from './components/OnlineGame/JoinGame';
+import {AuthContext} from './Firebase/Auth'
+import CreateOnlineGame from './components/OnlineGame/CreateOnlineGame';
+import context from 'react-bootstrap/esm/AccordionContext';
 
-  render() {
-    return (
-      <AppContext.Provider value={{
-        state: this.state,
-        setGameType: (game) => this.setState({
-          gameType: game
-        }),
-        setGameDifficulty: (mode) => this.setState({
-          gameMode: mode
-        }),
-        setExperimentalFlag: () => this.setState({
-          experimentalFlag: this.state.experimentalFlag == false ? true : false
-        })
-      }}>
-        {this.props.children}
-        {console.log('game type: ' + this.state.gameType)}
-        {console.log('difficulty: ' + this.state.gameMode)}
-        {console.log('experimental: ' + this.state.experimentalFlag + ' ' + typeof this.state.experimentalFlag)}
-      </AppContext.Provider>
-    )
-  }
-}
+const auth = firebase.auth();
+
 
 
 function App(){
-
-  return (
-    <AppProvider>
-      <Navbar></Navbar>
-      <PlayerChoice ></PlayerChoice>
-    <div className="App mt-3">
-      <Container fluid className="">
-        <Row>
-          <Col><ConnectFour className="mt-5 marginTop"></ConnectFour></Col>
-        </Row>
-      </Container>
-    </div>
-    </AppProvider>
-  );
+  const [user] = useAuthState(auth);
+    return (
+      <AppContext.Consumer>
+        {(context) => (
+      <React.Fragment>
+        <Navbar></Navbar>
+        {user ? <CreateOnlineGame/> : <PlayerChoice/>}
+      <div className="App mt-3">
+        <Container fluid className="">
+          <Row>
+        <Col>
+          {context.state.gameType == 'onlineGame' ? <OnlineGame gameCode = {context.state.gameCode} gameDocumentId = {context.state.gameDocumentId}></OnlineGame> 
+                :  <ConnectFour className="mt-5 marginTop"></ConnectFour> }
+        </Col>
+          </Row>
+        </Container>
+      </div>
+      </React.Fragment>
+        )}
+      </AppContext.Consumer>
+    );
 }
 
 
