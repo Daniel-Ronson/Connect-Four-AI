@@ -221,6 +221,8 @@ class ConnectFour extends React.Component {
        {
          this.makeMove(Math.floor((Math.random() *7)),board,allTokensInBoard[i]);
        }
+       let toggle_player = this.togglePlayer()
+       this.setState({currentPlayer: toggle_player });  
        this.setState({board: this.state.board});
        this.checkBoard(board);
     }
@@ -236,7 +238,7 @@ class ConnectFour extends React.Component {
       let shuffleButton
 
       if(this.state.gameOver === false && this.state.shuffledUsed == false){
-        shuffleButton = <div className="shuffleButton" onClick={() => {this.shuffleBoard()}}>Shuffle</div>          
+        shuffleButton = <div className="shuffleButton" title = "This will take up your turn" onClick={() => {this.shuffleBoard()}}>Shuffle</div>          
         
       }
 
