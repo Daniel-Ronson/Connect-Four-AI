@@ -2,6 +2,12 @@ import './ConnectFour.css'
 import React from 'react';
 import {postBoardState} from '../../Requests/ConnectFourRequest'
 import AppContext from '../../AppContext'
+
+import firebase from '../../Firebase/Firebase' 
+const auth = firebase.auth();
+const firestore = firebase.firestore();
+
+
 class ConnectFour extends React.Component {
     constructor(props) { 
       super(props);

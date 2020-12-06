@@ -1,44 +1,37 @@
-import './ConnectFour.css'
-import React from 'react';
-import {postBoardState} from '../../Requests/ConnectFourRequest'
-class ConnectFour extends React.Component {
-    constructor(props) {
-      super(props);
-      
-      this.state = {
-        player1: 1,
-        player2: 2,
-        shuffledUsed: false,
-        currentPlayer: null,
-        board: [],
-        gameOver: false,
-        message: '',
-        gameType: 'singlePlayer',
-        winningCoordinates: []
-      };
-      
-      // Bind play function to App component
-      this.play = this.play.bind(this);
-    }
-    
-     setCoordinates(coordinates){
-      // coordinates = [[1,2],[3,4]]
-                //let winningCoordinates = Object.assign({}, prevState.winningCoordinates)
-        let coords = [...this.state.winningCoordinates]
-        coordinates.map(el => coords.push(el))
-        this.setState({
-          winningCoordinates: coords
-        })  
-    }
+import React, {useContext, useEffect, useState} from 'react';
+import AppContext from '../../AppContext'
 
-    // Starts new game
-    initBoard() {
-      // Create a blank 6x7 matrix
-      let board = [];
-      for (let r = 0; r < 6; r++) {
-        let row = [];
-        for (let c = 0; c < 7; c++) { row.push(null) }
-        board.push(row);
+import firebase from '../../Firebase/Firebase' 
+import ConnectFour from '../ConnectFour/ConnectFour'
+//10109
+const auth = firebase.auth();
+const firestore = firebase.firestore();
+
+function OnlineGame(props){
+  const appContext = useContext(AppContext)
+  const  currUser  = auth.currentUser;
+  const [gameData,setGameData] = useState()
+  const [gameDocId,setGameDocId] = useState(props.gameDocumentId)
+
+  const [gameCode,setGameCode] = useState()
+  const [board,setBoard] = useState()
+  //const [boar,setGameCode] = useState()
+
+
+  useEffect( () => {
+    setGameDocId(props.gameDocumentId)
+    console.log('searching for doc: ' , gameDocId)
+    console.log('props: ' + props.gameDocumentId)
+    const unsubscribe = firestore.collection('Game').doc(props.gameDocumentId)
+    .onSnapshot(
+       doc => {
+        if(!doc.empty){
+          console.log('GOT data: ')
+          console.log(doc.data())
+
+         setGameData(doc.data().p1DisplayName)
+         setGameCode(doc.data().gameCode)
+         setBoard(doc.data().board)
       }
       
       this.setState({

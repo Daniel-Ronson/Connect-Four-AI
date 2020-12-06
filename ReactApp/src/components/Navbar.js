@@ -1,12 +1,10 @@
-import React, { useRef, useState } from 'react';
+import React from 'react';
 
 import {Navbar, Nav, Button} from 'react-bootstrap';
 import logo from '../images/logo.PNG'
 import '../App.css'
-
 import firebase from '../Firebase/Firebase' 
 import { useAuthState } from 'react-firebase-hooks/auth';
-import CreateOnlineGame from './CreateOnlineGame'
 const auth = firebase.auth();
 
 function SignIn() {
