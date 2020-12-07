@@ -14,7 +14,8 @@ class AppProvider extends Component {
     gameCode: null,
     onlineGameJoined: false,
     onlineGameCanBeJoined: false,
-    gameDocumentId: null
+    gameDocumentId: null,
+    isOnline: false
   }
 
 
@@ -41,15 +42,19 @@ class AppProvider extends Component {
         }),
         setGameDocumentId: (docRef) => this.setState({
           gameDocumentId: docRef
-        })
-
+        }),
+        toggleIsOnline: () => this.setState({
+          isOnline: this.state.isOnline == false ? true : false
+        }),
 
       }}>
         {this.props.children}
         {console.log('Mode: ' + this.state.gameType)}
         {console.log('gameCode State: ' + this.state.gameCode)}
         {console.log('Doc Ref: ' + this.state.gameDocumentId)}
+        {console.log('Online Mode: ' + this.state.isOnline)}
         {console.log('')}
+
 
       </AppContext.Provider>
     )

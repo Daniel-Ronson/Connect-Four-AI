@@ -23,13 +23,14 @@ function App(){
         {(context) => (
       <React.Fragment>
         <Navbar></Navbar>
-        {user ? <CreateOnlineGame/> : <PlayerChoice/>}
+        {user && context.state.isOnline == true ? <CreateOnlineGame/> : <PlayerChoice/>}
       <div className="App mt-3">
         <Container fluid className="">
           <Row>
         <Col>
-          {context.state.gameType == 'onlineGame' ? <OnlineGame gameCode = {context.state.gameCode} gameDocumentId = {context.state.gameDocumentId}></OnlineGame> 
-                :  <ConnectFour className="mt-5 marginTop"></ConnectFour> }
+          {(user && context.state.isOnline == true)
+            ? <OnlineGame gameDocumentId = {context.state.gameDocumentId}>   </OnlineGame> 
+            : <ConnectFour gameType={context.state.gameType} className="mt-5 marginTop">  </ConnectFour> }
         </Col>
           </Row>
         </Container>

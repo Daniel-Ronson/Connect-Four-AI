@@ -41,6 +41,7 @@ function JoinGame(props){
                 <input type="submit" value="Join Game" onClick={e =>{
                     e.preventDefault()
                    // context.setGameCode(gameInput)
+                    context.setGameType('onlineGame')
                     context.setGameDocumentId(gameInput)
                 }} />
             </form>

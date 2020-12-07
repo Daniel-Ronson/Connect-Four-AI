@@ -1,4 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
+import context from 'react-bootstrap/esm/AccordionContext';
 import AppContext from '../../AppContext'
 
 import firebase from '../../Firebase/Firebase' 
@@ -9,34 +10,55 @@ const firestore = firebase.firestore();
 
 function OnlineGame(props){
   const appContext = useContext(AppContext)
-  const  currUser  = auth.currentUser;
+  const { uid } = auth.currentUser;
   const [gameData,setGameData] = useState()
-  const [gameDocId,setGameDocId] = useState(props.gameDocumentId)
+  const [gameDocId,setGameDocId] = useState(0)
+  const [playerId,setPlayerId] = useState(0)
 
-  const [gameCode,setGameCode] = useState()
+  const [isTurn,setIsTurn] = useState()
+  const [isPlayer1,setIsPlayer1] = useState()
+  const [returnErrorMessage, setReturnErrorMessage] = useState(false)
+  const [canJoinGame,setCanJoinGame] = useState(false)
+
   const [board,setBoard] = useState()
   //const [boar,setGameCode] = useState()
 
 
+  const gameRef = firestore.collection('Game')
   useEffect( () => {
     setGameDocId(props.gameDocumentId)
-    console.log('searching for doc: ' , gameDocId)
-    console.log('props: ' + props.gameDocumentId)
-    const unsubscribe = firestore.collection('Game').doc(props.gameDocumentId)
+    console.log('searching for doc: ' , props.gameDocumentId)
+    if(props.gameDocumentId !==  null){
+    const unsubscribe = gameRef.doc(props.gameDocumentId)
     .onSnapshot(
        doc => {
-        if(!doc.empty){
+        if(typeof doc.data() !== 'undefined'){
+          if (uid === doc.data().p1ID){
+            setIsPlayer1(true)
+            console.log('is player 1')
+          }
+          else if (uid === doc.data().p2ID){
+            setIsPlayer1(false)
+            console.log('is not player 1')
+          }
+          else {setReturnErrorMessage(true); return;}
+          // if p1 id equals uid, then set player to player 1 
+          // else if p2 id equals uid, then set.....
+          // else Display Error Message: invalid game invite
+        
           console.log('GOT data: ')
           console.log(doc.data())
 
          setGameData(doc.data().p1DisplayName)
-         setGameCode(doc.data().gameCode)
-         setBoard(doc.data().board)
+         setIsTurn(doc.data().p1Turn)
+         let newBoard = JSON.parse(doc.data().board)
+         setBoard(newBoard)
+         setCanJoinGame(true) // Game Succesfully joined
       }
       else{
-        console.log('failure')
-          setGameData(0)
-          setGameCode(0)
+        console.log('invalid code')
+        setReturnErrorMessage(true)
+        //ToDo: Reset Data to 0 
       }
       },
       err => {
@@ -44,7 +66,8 @@ function OnlineGame(props){
       }
     )
     return () => unsubscribe()
-     },[props.gameCode,props.gameDocumentId])
+    } // end of if
+     },[props.gameDocumentId])
 
  const updateGame = async (newBoard) => {
       firestore.collection('Game').doc(gameDocId).update({board: newBoard}).then( () => {
@@ -52,104 +75,46 @@ function OnlineGame(props){
         return true
       }).catch(() => {console.log('Update Failure'); return false})
   }
+  const togglePlayer = async () => {
+    let flag = isTurn ? false : true
+    firestore.collection('Game').doc(gameDocId).update({p1Turn: flag}).then( () => {
+      console.log('update Successful')
+      return true
+    }).catch(() => {console.log('Update Failure'); return false})
+  }
+
+  const setStateToBase = async () => {
+    setIsTurn(true)
+  }
+
+  const setNewGame = async ()  => {
+    firestore.collection('Game').doc(gameDocId).update({board: ''}).then( () => {
+      console.log('game cleared')
+      return true
+    }).catch(() => {console.log('New Game Failed'); return false})
+    setStateToBase()
+  }
 
    return(
     <React.Fragment>
-      <ConnectFour board={board} updateGameOnline={updateGame} ></ConnectFour>
+      <ConnectFour
+       board={board}  
+       updateGameOnline={updateGame} // updates game board
+       togglePlayerOnline = {togglePlayer} 
+       initGameOnline = {setNewGame}
+       gameType={appContext.state.gameType} // single, mulitplayer, or online
+       isTurn={isTurn} // true if it is player 1 turn
+       isPlayer1 = {isPlayer1}  // true if you are player 1 
+       canJoinGame = {canJoinGame} //initially set to false
+       returnErrorMessage = {returnErrorMessage}  // false if error occured while joining game
+      >
+      </ConnectFour>
     <div>hi</div>
-    <p>game data: {gameData ? gameData : null}</p>
+    <p>Player 1: {isPlayer1 ? isPlayer1 : null}</p>
     <p>game board: {board ? board : null}</p>
-    <p>game code: {gameCode}</p>
+    <p>Player 1 Turn: {isTurn}</p>
     </React.Fragment> 
     )
 }
 
-// function OnlineConnectFour(props){
-//   const gameRef =  firestore.collection('Game')
-//  const query = gameRef.where('gameCode','==',props.gameCode)
-//  const [value,loading,error] = useDocumentData(query,{ idField: 'id' }); 
-
-//  return(
-//   <ConnectFour></ConnectFour>
-//  )
-// }
-
 export default OnlineGame
-
-  // const connectToGame = async () => {
-  //   const unsubscribe = firestore.collection('Game').where('gameCode','==',props.gameCode)
-  //     .onSnapshot(
-  //       doc => {
-  //         console.log('got data: ')
-  //         doc.docs.map(el => {
-  //           console.log(el.data())
-  //         })
-  //         //setGameData(doc)
-  //         // setGameCode(doc)
-  //         // setGameData(snapshot.data().p1DisplayName)
-  //       },
-  //       err => {
-  //         console.log('error')
-  //       }
-  //     )
-  //     return () => unsubscribe()
-    // if(!gameRef.empty){
-    //   const snapshot = gameRef.docs[0]
-    //   console.log(snapshot.data())
-    //   setGameData(snapshot.data().p1DisplayName)
-    // }
-    // else{
-    //   console.log('FAILED: ' + props.gameCode)
-    //  console.log('FAILED to LISTEN')
-    // }
- // }
-
-// useEffect( () => {
-//   setGameCode(props.gameCode)
-//   connectToGame()
-//   // console.log('online game:')
-//   //  const unsubscribe = gameRef.onSnapshot((snapshot) => {
-//   //     const gameDatas = []
-//   //     snapshot.forEach( el => {gameDatas.push(el.data())})
-//   //     setGameData(gameDatas)
-//   //     console.log('game data: ' + gameDatas)
-//    },[props.gameCode])
-
-//     return unsubscribe()
-// })
-
-// const doc = gameRef.get().then(() => {
-//   console.log('DOCUMENT' + doc)
-// })
-// // if(!doc.exists) {
-// //   console.log('FAILED to LISTEN')
-// // }
-// // else{
-// //   console.log('SNAPSHOT' + doc)
-// // }
-
-// gameRef.get().then((snapshot) => {
-//   if(snapshot) {
-//     console.log('snapshot: ' + snapshot)
-//     //  snapshot.forEach(doc => {
-//     //   console.log(doc.data())
-//     // })
-
-    // gameRef.onSnapshot((querySnapshot) => {
-    //   console.log(querySnapshot)
-
-    //   // querySnapshot.docs.map(doc => {
-    //   //   console.log(doc.data())
-    //   // })
-    // })
-  
-//   else{
-//     console.log('FAILED to LISTEN')
-//   }
-// })
-// const unsubscribe = gamRef.where('gameCode','==',props.gameCode).get()
-// const query = gameRef.where('gameCode','==',props.gameCode)
-// const [value,loading,error] = useDocumentData(query,{ idField: 'id' }); 
-// if (value){
-//   console.log('Streaming Document: ' , value)
-//}

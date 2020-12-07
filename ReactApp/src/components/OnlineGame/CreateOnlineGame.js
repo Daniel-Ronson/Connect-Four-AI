@@ -27,6 +27,7 @@ function CreateOnlineGame(){
            p2NewGame: false,
            GameOver: false,
            board: '',
+           p1Turn: true
          }).then( (docRef) => {
             console.log('DOCUMENT REF: ',  docRef.id)
             console.log(typeof  docRef.id)
