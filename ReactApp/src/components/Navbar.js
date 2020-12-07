@@ -7,6 +7,7 @@ import firebase from '../Firebase/Firebase'
 import { useAuthState } from 'react-firebase-hooks/auth';
 import AppContext from '../AppContext'
 
+const auth = firebase.auth();
 
 function SignIn(props) {
   const [user] = useState(props.user)

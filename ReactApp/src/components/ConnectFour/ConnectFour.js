@@ -64,7 +64,14 @@ class ConnectFour extends React.Component {
         shuffledUsed: false
       });
     }
-    
+
+    async initGameOnline(){
+      //this.initBoard()
+    //  if(this.props.isTurn === false){  // Player 1 always starts
+        this.props.initGameOnline()
+     // }
+    }
+
     togglePlayer(togglePlayer = this.state.currentPlayer ) {
       return ( this.state.currentPlayer  === this.state.player1) ? this.state.player2 : this.state.player1;
     }
@@ -265,11 +272,11 @@ class ConnectFour extends React.Component {
         shuffleButton = <div className="shuffleButton" title = "This will take up your turn" onClick={() => {this.shuffleBoard()}}>Shuffle</div>          
         
       } 
-      // if (this.props.gameType === "onlineGame")  {
-      //   button = <div className="newGameButton" onClick={() => {this.props.initGameOnline();this.initBoard()}}>New Game</div>
-      // }  
-      // else{  button = <div className="newGameButton" onClick={() => {this.initBoard()}}>New Game</div>}
-      button = <div className="newGameButton" onClick={() => {this.initBoard()}}>New Game</div>
+      if (this.props.gameType === "onlineGame")  {
+        button = <div className="newGameButton" onClick={() => {this.initGameOnline();this.initBoard()}}>New Game</div>
+      }  
+      else{  button = <div className="newGameButton" onClick={() => {this.initBoard()}}>New Game</div>}
+     // button = <div className="newGameButton" onClick={() => {this.initBoard()}}>New Game</div>
       let index = 0
 
       return (

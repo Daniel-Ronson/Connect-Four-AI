@@ -11,12 +11,12 @@ const firestore = firebase.firestore();
 function OnlineGame(props){
   const appContext = useContext(AppContext)
   const { uid } = auth.currentUser;
-  const [gameData,setGameData] = useState()
+  const [gameData,setGameData] = useState(false)
   const [gameDocId,setGameDocId] = useState(0)
   const [playerId,setPlayerId] = useState(0)
 
-  const [isTurn,setIsTurn] = useState()
-  const [isPlayer1,setIsPlayer1] = useState()
+  const [isTurn,setIsTurn] = useState(false)
+  const [isPlayer1,setIsPlayer1] = useState(false)
   const [returnErrorMessage, setReturnErrorMessage] = useState(false)
   const [canJoinGame,setCanJoinGame] = useState(false)
 
@@ -84,14 +84,14 @@ function OnlineGame(props){
   }
 
   const setStateToBase = async () => {
+    if(isPlayer1)
     setIsTurn(true)
   }
 
   const setNewGame = async ()  => {
-    firestore.collection('Game').doc(gameDocId).update({board: ''}).then( () => {
+    firestore.collection('Game').doc(gameDocId).update({board: '',p1Turn: true}).then( () => {
       console.log('game cleared')
-      return true
-    }).catch(() => {console.log('New Game Failed'); return false})
+    }).catch(() => {console.log('New Game Failed');})
     setStateToBase()
   }
 
@@ -112,7 +112,7 @@ function OnlineGame(props){
     <div>hi</div>
     <p>Player 1: {isPlayer1 ? isPlayer1 : null}</p>
     <p>game board: {board ? board : null}</p>
-    <p>Player 1 Turn: {isTurn}</p>
+    <p>Player 1 Turn: {isTurn.toString()}</p>
     </React.Fragment> 
     )
 }
