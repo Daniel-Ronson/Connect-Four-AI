@@ -30,7 +30,7 @@ function CreateOnlineGame(){
          }).then( (docRef) => {
             console.log('DOCUMENT REF: ',  docRef.id)
             console.log(typeof  docRef.id)
-
+            appContext.setGameType('onlineGame')
             setGameCode(gameCode)
             setgameDocumentId(docRef.id)
             appContext.setGameDocumentId(docRef.id)

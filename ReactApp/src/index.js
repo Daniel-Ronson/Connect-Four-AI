@@ -46,6 +46,7 @@ class AppProvider extends Component {
 
       }}>
         {this.props.children}
+        {console.log('Mode: ' + this.state.gameType)}
         {console.log('gameCode State: ' + this.state.gameCode)}
         {console.log('Doc Ref: ' + this.state.gameDocumentId)}
         {console.log('')}
