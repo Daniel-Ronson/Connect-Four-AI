@@ -5,7 +5,7 @@ import firebase from '../../Firebase/Firebase'
 const firestore = firebase.firestore();
 
 function JoinGame(props){
-    const [gameInput,_setInput] = useState()
+    const [gameInput,_setInput] = useState('')
     const appContext = useContext(AppContext)
     const setInput = (input) => {
         _setInput(input)

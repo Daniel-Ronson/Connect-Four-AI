@@ -37,11 +37,15 @@ function OnlineGame(props){
             setIsPlayer1(true)
             console.log('is player 1')
           }
-          else if (uid === doc.data().p2ID){
+          // toDO: set doc.data().p2ID = uid
+          //if (uid === doc.data().p2ID){
+          else {
             setIsPlayer1(false)
             console.log('is not player 1')
           }
-          else {setReturnErrorMessage(true); return;}
+          //else {setReturnErrorMessage(true); return;}
+
+          
           // if p1 id equals uid, then set player to player 1 
           // else if p2 id equals uid, then set.....
           // else Display Error Message: invalid game invite
@@ -51,7 +55,10 @@ function OnlineGame(props){
 
          setGameData(doc.data().p1DisplayName)
          setIsTurn(doc.data().p1Turn)
+         console.log('the board: ' + doc.data().board)
+        // if(doc.data().board != "")
          let newBoard = JSON.parse(doc.data().board)
+         console.log('the board: ' + newBoard)
          setBoard(newBoard)
          setCanJoinGame(true) // Game Succesfully joined
       }
@@ -83,14 +90,26 @@ function OnlineGame(props){
     }).catch(() => {console.log('Update Failure'); return false})
   }
 
+  const makeMoveOnline = async (newBoard) => {
+    let flag = isTurn ? false : true
+    firestore.collection('Game').doc(gameDocId).update({board: newBoard,p1Turn: flag}).then( () => {
+      console.log('update Successful')
+      return true
+    }).catch(() => {console.log('Update Failure'); return false})
+  }
   const setStateToBase = async () => {
     if(isPlayer1)
     setIsTurn(true)
+    //setBoard('')
   }
 
+  // If i set the board equal to null, in useEffect, the JSON.parse does not work, So it must be set to an object
+  const boardInitialState = "[[null,null,null,null,null,null,null],[null,null,null,null,null,null,null],[null,null,null,null,null,null,null],[null,null,null,null,null,null,null],[null,null,null,null,null,null,null],[null,null,null,null,null,null,null]]"
+
   const setNewGame = async ()  => {
-    firestore.collection('Game').doc(gameDocId).update({board: '',p1Turn: true}).then( () => {
+    await firestore.collection('Game').doc(gameDocId).update({board: boardInitialState,p1Turn: true}).then( (doc) => {
       console.log('game cleared')
+
     }).catch(() => {console.log('New Game Failed');})
     setStateToBase()
   }
@@ -101,6 +120,7 @@ function OnlineGame(props){
        board={board}  
        updateGameOnline={updateGame} // updates game board
        togglePlayerOnline = {togglePlayer} 
+       makeMoveOnline = {makeMoveOnline} //combines updateGameOnline and togglePlayerOnline
        initGameOnline = {setNewGame}
        gameType={appContext.state.gameType} // single, mulitplayer, or online
        isTurn={isTurn} // true if it is player 1 turn
@@ -109,10 +129,9 @@ function OnlineGame(props){
        returnErrorMessage = {returnErrorMessage}  // false if error occured while joining game
       >
       </ConnectFour>
-    <div>hi</div>
-    <p>Player 1: {isPlayer1 ? isPlayer1 : null}</p>
+    {/* <p>Player 1: {isPlayer1 ? isPlayer1 : null}</p>
     <p>game board: {board ? board : null}</p>
-    <p>Player 1 Turn: {isTurn.toString()}</p>
+    <p>Player 1 Turn: {isTurn.toString()}</p> */}
     </React.Fragment> 
     )
 }

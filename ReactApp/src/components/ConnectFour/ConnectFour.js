@@ -103,24 +103,31 @@ class ConnectFour extends React.Component {
   
     async play(gameType,gameDifficulty,c, gameCode, gameJoined) {
 
+      let board = this.state.board;
+      // Check status of board
+      let result = this.checkAll(board);
+      this.setResult(result,board)
       // Single Player or Online Game
-      if (!this.state.gameOver && ( (gameType == 'singlePlayer' && this.state.currentPlayer === 1) || (gameType === 'multiPlayer') ||
+      if (!this.state.gameOver && this.state.gameOver === false  && ( (gameType == 'singlePlayer' && this.state.currentPlayer === 1) || (gameType === 'multiPlayer') ||
        (gameType === 'onlineGame' && (  (this.props.isPlayer1===true && this.props.isTurn ===true) || (this.props.isPlayer1===false && this.props.isTurn ===false) ) )  )) {
 
         // Place piece on board
-        let board = this.state.board;
-        board = this.makeMove(c,board)
+        if (gameType === 'onlineGame'){
+          let onlinePlayer = this.props.isPlayer1==true ? 1 : 2
+          this.makeMove(c,board,onlinePlayer)
+        }
+
+        else{board = this.makeMove(c,board)}
 
         // Check status of board
-        let result = this.checkAll(board);
-        if (result === this.state.player1) {
-          this.setState({ board, gameOver: true, message: 'Red Player wins!' });
-        } else if (result === this.state.player2) {
-          this.setState({ board, gameOver: true, message: 'Yellow Player wins!' });
-        } else if (result === 'draw') {
-          this.setState({ board, gameOver: true, message: 'Draw game.' });
-        } 
-        
+        result = this.checkAll(board);
+        this.setResult(result,board)
+
+        //IF Game is over and its an online game, must update Firestore
+        if (gameType === "onlineGame" && this.state.gameOver === true ){
+          await this.props.updateGameOnline(JSON.stringify(this.state.board))
+        }
+
         // Game continues
         else if(this.state.gameOver === false) {
 
@@ -139,8 +146,7 @@ class ConnectFour extends React.Component {
 
           // Online Game
           else if (gameType === "onlineGame"){
-            await this.props.updateGameOnline(JSON.stringify(this.state.board))
-            this.props.togglePlayerOnline()
+            await this.props.makeMoveOnline(JSON.stringify(this.state.board))
           }
 
         }
@@ -149,7 +155,17 @@ class ConnectFour extends React.Component {
       }
 
     }
+    async setResult(result,board){
+      if (result === this.state.player1) {
+        this.setState({ board, gameOver: true, message: 'Red Player wins!' });
+      } else if (result === this.state.player2) {
+        this.setState({ board, gameOver: true, message: 'Yellow Player wins!' });
+      } else if (result === 'draw') {
+        this.setState({ board, gameOver: true, message: 'Draw game.' });
+      } 
+    }
 
+   
      checkVertical(board) {
       // Check only if row is 3 or greater
       for (let r = 3; r < 6; r++) {
@@ -288,7 +304,7 @@ class ConnectFour extends React.Component {
             <thead>
             </thead>
             <tbody>
-              {board.map((row, i) => (<Column index = {index++} key={i} row={row} play={this.play} winningCoordinates = {winningCoordinates}/>))}
+              {board.map((row, i) => (<Column index = {index++} key={i} row={row} play={this.play} playOnline={this.playOnline} winningCoordinates = {winningCoordinates}/>))}
             </tbody>
           </table>
           {(context.state.experimentalFlag == true) && shuffleButton }
@@ -301,16 +317,16 @@ class ConnectFour extends React.Component {
   }
   
   // Column component
-  const Column = ({ index, row, play, winningCoordinates }) => {
+  const Column = ({ index, row, play, playOnline, winningCoordinates }) => {
     let rowIndex = 0
     return (
       <tr>
-        {row.map((cell, i) => <Cell key={i} column= {index} row = {rowIndex++} value={cell} columnIndex={i} play={play} winningCoordinates = {winningCoordinates}/>)}
+        {row.map((cell, i) => <Cell key={i} column= {index} row = {rowIndex++} value={cell} columnIndex={i} play={play} playOnline = {playOnline} winningCoordinates = {winningCoordinates}/>)}
       </tr>
     );
   };
   
-  const Cell = ({ column, row,value, columnIndex, play, winningCoordinates}) => {
+  const Cell = ({ column, row,value, columnIndex, play, playOnline,  winningCoordinates}) => {
 
     let flag = false
     if(winningCoordinates.length > 0){
