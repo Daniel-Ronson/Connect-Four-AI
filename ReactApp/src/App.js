@@ -10,10 +10,7 @@ import Navbar from './components/Navbar'
 import {Container, Col, Row} from 'react-bootstrap';
 import firebase from './Firebase/Firebase' 
 import { useAuthState } from 'react-firebase-hooks/auth';
-import JoinGame from './components/OnlineGame/JoinGame';
-import {AuthContext} from './Firebase/Auth'
 import CreateOnlineGame from './components/OnlineGame/CreateOnlineGame';
-import context from 'react-bootstrap/esm/AccordionContext';
 
 const auth = firebase.auth();
 

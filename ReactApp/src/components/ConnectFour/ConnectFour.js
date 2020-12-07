@@ -1,7 +1,6 @@
 import './ConnectFour.css'
-import React, {useContext, useEffect, useState} from 'react';
+import React from 'react';
 import {postBoardState} from '../../Requests/ConnectFourRequest'
-import {GetOnlineGame} from '../../Firebase/GetOnlineGame'
 import AppContext from '../../AppContext'
 
 import firebase from '../../Firebase/Firebase' 
