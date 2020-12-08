@@ -1,12 +1,7 @@
 import './ConnectFour.css'
-import React, {useContext} from 'react';
+import React from 'react';
 import {postBoardState} from '../../Requests/ConnectFourRequest'
 import AppContext from '../../AppContext'
-
-import firebase from '../../Firebase/Firebase' 
-const auth = firebase.auth();
-const firestore = firebase.firestore();
-
 
 class ConnectFour extends React.Component {
     constructor(props) { 
@@ -33,7 +28,12 @@ class ConnectFour extends React.Component {
         this.initBoard()  
       }
       if(this.props.board !== prevProps.board){
-        this.setState({board:this.props.board})
+        this.setState({board:this.props.board}, () => {
+          // Check status of board for win
+          let result = this.checkAll(this.props.board);
+          this.setResult(result,this.props.board)
+        })
+        // ToDo: if game is over, 
       }
     }
     
@@ -100,27 +100,33 @@ class ConnectFour extends React.Component {
       } 
     })
   }
+
+  async setResult(result,board){
+    if (result === this.state.player1) {
+      this.setState({ board, gameOver: true, message: 'Red Player wins!' });
+    } else if (result === this.state.player2) {
+      this.setState({ board, gameOver: true, message: 'Yellow Player wins!' });
+    } else if (result === 'draw') {
+      this.setState({ board, gameOver: true, message: 'Draw game.' });
+    } 
+  }
   
     async play(gameType,gameDifficulty,c, gameCode, gameJoined) {
 
-      let board = this.state.board;
-      // Check status of board
-      let result = this.checkAll(board);
-      this.setResult(result,board)
-      // Single Player or Online Game
       if (!this.state.gameOver && this.state.gameOver === false  && ( (gameType == 'singlePlayer' && this.state.currentPlayer === 1) || (gameType === 'multiPlayer') ||
-       (gameType === 'onlineGame' && (  (this.props.isPlayer1===true && this.props.isTurn ===true) || (this.props.isPlayer1===false && this.props.isTurn ===false) ) )  )) {
+       (gameType === 'onlineGame' && this.props.canJoinGame === true && (  (this.props.isPlayer1===true && this.props.isTurn ===true) || (this.props.isPlayer1===false && this.props.isTurn ===false) ) )  )) {
 
         // Place piece on board
+        let board = this.state.board;
         if (gameType === 'onlineGame'){
-          let onlinePlayer = this.props.isPlayer1==true ? 1 : 2
+          let onlinePlayer = this.props.isPlayer1===true ? 1 : 2
           this.makeMove(c,board,onlinePlayer)
         }
 
         else{board = this.makeMove(c,board)}
 
         // Check status of board
-        result = this.checkAll(board);
+        let result = this.checkAll(board);
         this.setResult(result,board)
 
         //IF Game is over and its an online game, must update Firestore
@@ -155,16 +161,6 @@ class ConnectFour extends React.Component {
       }
 
     }
-    async setResult(result,board){
-      if (result === this.state.player1) {
-        this.setState({ board, gameOver: true, message: 'Red Player wins!' });
-      } else if (result === this.state.player2) {
-        this.setState({ board, gameOver: true, message: 'Yellow Player wins!' });
-      } else if (result === 'draw') {
-        this.setState({ board, gameOver: true, message: 'Draw game.' });
-      } 
-    }
-
    
      checkVertical(board) {
       // Check only if row is 3 or greater
@@ -255,7 +251,7 @@ class ConnectFour extends React.Component {
 
         for (let r = 0; r < 6; r++) {
           for (let c = 0; c < 7; c++) {
-            if (board[r][c] != null) {
+            if (board[r][c] !== null) {
                 allTokensInBoard.push(board[r][c])
                 board[r][c] = null
               }
@@ -269,7 +265,10 @@ class ConnectFour extends React.Component {
        let toggle_player = this.togglePlayer()
        this.setState({currentPlayer: toggle_player });  
        this.setState({board: this.state.board});
-       this.checkBoard(board);
+       let result = this.checkAll(board);
+       this.setResult(result,board)
+      // this.checkBoard(board);
+       
     }
     
     UNSAFE_componentWillMount() {
@@ -277,14 +276,11 @@ class ConnectFour extends React.Component {
     }
     
     render() {
-      let noTBoard = this.props.board
-        let board = [...this.state.board]; 
-
-
+      let board = [...this.state.board]; 
       let winningCoordinates = [...this.state.winningCoordinates] //2d array containing tuples of coordinates
       let button
       let shuffleButton
-      if(this.state.gameOver === false && this.state.shuffledUsed == false){
+      if(this.state.gameOver === false && this.state.shuffledUsed === false && this.props.gameType !== 'onlineGame'){
         shuffleButton = <div className="shuffleButton" title = "This will take up your turn" onClick={() => {this.shuffleBoard()}}>Shuffle</div>          
         
       } 
@@ -292,7 +288,6 @@ class ConnectFour extends React.Component {
         button = <div className="newGameButton" onClick={() => {this.initGameOnline();this.initBoard()}}>New Game</div>
       }  
       else{  button = <div className="newGameButton" onClick={() => {this.initBoard()}}>New Game</div>}
-     // button = <div className="newGameButton" onClick={() => {this.initBoard()}}>New Game</div>
       let index = 0
 
       return (
@@ -304,10 +299,10 @@ class ConnectFour extends React.Component {
             <thead>
             </thead>
             <tbody>
-              {board.map((row, i) => (<Column index = {index++} key={i} row={row} play={this.play} playOnline={this.playOnline} winningCoordinates = {winningCoordinates}/>))}
+              {board.map((row, i) => (<Column index = {index++} key={i} row={row} play={this.play} winningCoordinates = {winningCoordinates}/>))}
             </tbody>
           </table>
-          {(context.state.experimentalFlag == true) && shuffleButton }
+          {(context.state.experimentalFlag === true) && shuffleButton }
           <p className="message">{this.state.message}</p>
         </div>
         )}
@@ -317,16 +312,16 @@ class ConnectFour extends React.Component {
   }
   
   // Column component
-  const Column = ({ index, row, play, playOnline, winningCoordinates }) => {
+  const Column = ({ index, row, play, winningCoordinates }) => {
     let rowIndex = 0
     return (
       <tr>
-        {row.map((cell, i) => <Cell key={i} column= {index} row = {rowIndex++} value={cell} columnIndex={i} play={play} playOnline = {playOnline} winningCoordinates = {winningCoordinates}/>)}
+        {row.map((cell, i) => <Cell key={i} column= {index} row = {rowIndex++} value={cell} columnIndex={i} play={play} winningCoordinates = {winningCoordinates}/>)}
       </tr>
     );
   };
   
-  const Cell = ({ column, row,value, columnIndex, play, playOnline,  winningCoordinates}) => {
+  const Cell = ({ column, row,value, columnIndex, play,  winningCoordinates}) => {
 
     let flag = false
     if(winningCoordinates.length > 0){
@@ -349,14 +344,7 @@ class ConnectFour extends React.Component {
     return (
       <AppContext.Consumer>
       {(context) => (
-      <td>
-        {
-          // context.state.gameType == "onlineGame" && 
-          // <div className="cell" onClick={() => {onlinePlay(context.state.gameType, context.state.gameMode, columnIndex, context.state.gameCode, context.state.onlineGameJoined)}}>
-          //   <div className= {`square ${color}`} ></div>
-          // </div>
-        }
-      
+      <td>     
         <div className="cell" onClick={() => {play(context.state.gameType, context.state.gameMode, columnIndex, context.state.gameCode, context.state.onlineGameJoined)}}>
             <div className= {`square ${color}`} ></div>
         </div>

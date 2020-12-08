@@ -27,6 +27,7 @@ function OnlineGame(props){
   const gameRef = firestore.collection('Game')
   useEffect( () => {
     setGameDocId(props.gameDocumentId)
+    //setBoard(JSON.parse(boardInitialState))
     console.log('searching for doc: ' , props.gameDocumentId)
     if(props.gameDocumentId !==  null){
     const unsubscribe = gameRef.doc(props.gameDocumentId)
@@ -44,27 +45,24 @@ function OnlineGame(props){
             console.log('is not player 1')
           }
           //else {setReturnErrorMessage(true); return;}
-
-          
-          // if p1 id equals uid, then set player to player 1 
-          // else if p2 id equals uid, then set.....
-          // else Display Error Message: invalid game invite
-        
+      
           console.log('GOT data: ')
           console.log(doc.data())
 
-         setGameData(doc.data().p1DisplayName)
          setIsTurn(doc.data().p1Turn)
-         console.log('the board: ' + doc.data().board)
-        // if(doc.data().board != "")
-         let newBoard = JSON.parse(doc.data().board)
-         console.log('the board: ' + newBoard)
+         let newBoard = JSON.parse(boardInitialState)
+         if (doc.data().board !== '')
+           newBoard = JSON.parse(doc.data().board)
+
          setBoard(newBoard)
          setCanJoinGame(true) // Game Succesfully joined
+         setReturnErrorMessage(false)
+         appContext.toggleGameJoined(true)
       }
       else{
         console.log('invalid code')
         setReturnErrorMessage(true)
+        appContext.toggleGameJoined(false)
         //ToDo: Reset Data to 0 
       }
       },
@@ -98,9 +96,7 @@ function OnlineGame(props){
     }).catch(() => {console.log('Update Failure'); return false})
   }
   const setStateToBase = async () => {
-    if(isPlayer1)
-    setIsTurn(true)
-    //setBoard('')
+    setIsTurn(true) //Player one goes first always
   }
 
   // If i set the board equal to null, in useEffect, the JSON.parse does not work, So it must be set to an object

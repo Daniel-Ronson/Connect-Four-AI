@@ -38,7 +38,6 @@ function SignOutButton() {
     <Button variant="outline-success" className="sign-out" onClick={() => {
       appContext.toggleIsOnline()
       appContext.setGameType('')
-      auth.signOut() 
     }}>
       Play Offline</Button>
   )

@@ -1,44 +1,28 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState} from 'react';
 import AppContext from '../../AppContext'
-import firebase from '../../Firebase/Firebase' 
-
-const firestore = firebase.firestore();
-
+import '../PlayerChoice/PlayerChoice.css'
 function JoinGame(props){
     const [gameInput,_setInput] = useState('')
-    const appContext = useContext(AppContext)
+    const [gameJoined,setGameJoined] = useState(false)
+
     const setInput = (input) => {
         _setInput(input)
     }
 
-    //  Like ComponentDidMount(), only runs whenprops.gameCode changes, because of optional array as parameter
     useEffect(() => {
         console.log('use effect')
         setInput(props.gameDocumentId)
-    },[props.gameDocumentId])
+        setGameJoined(props.setGameJoined)
+    },[props.gameDocumentId,props.gameJoined])
 
-    const checkIfGameExists = async (gameInput) => {
-        const gameRef = firestore.collection('Game');
-        const snapshot = await gameRef.where('gameCode','==',gameInput).get();
-        if (snapshot.empty){
-            console.log('empty')
-            return false
-        }
-        else{
-            snapshot.forEach(doc => {
-                console.log('data : ' + doc.data())
-             });    
-            return true
-        }
-        }
     return(
         <AppContext.Consumer>
         {(context) => (
             <React.Fragment>
             <form>
-                <label className="mr-2">Enter Code: </label>
-                    <input type="text" value={gameInput} onChange={e => setInput(e.target.value)}/>
-                <input type="submit" value="Join Game" onClick={e =>{
+                <label className="mr-2 mt-2">Enter Code: </label>
+                    <input type="text" className = "mr-2" value={gameInput} onChange={e => setInput(e.target.value)}/>
+                <input className={`controlPanelButton ${context.state.gameJoined===true ? 'background-green' : 'background-gray'}`} type="submit" value="Join Game" onClick={e =>{
                     e.preventDefault()
                    // context.setGameCode(gameInput)
                     context.setGameType('onlineGame')
@@ -53,3 +37,18 @@ function JoinGame(props){
 }
 
 export default JoinGame;
+
+// const checkIfGameExists = async (gameInput) => {
+//     const gameRef = firestore.collection('Game');
+//     const snapshot = await gameRef.where('gameCode','==',gameInput).get();
+//     if (snapshot.empty){
+//         console.log('empty')
+//         return false
+//     }
+//     else{
+//         snapshot.forEach(doc => {
+//             console.log('data : ' + doc.data())
+//          });    
+//         return true
+//     }
+//     }

@@ -70,9 +70,23 @@ body {
 
     margin-right: -1px;
     margin-top: -1px;
-    height: 70px;
-    width: 70px;  
+    height: 90px;
+    width: 90px;  
     cursor: pointer;
+}
+
+@media all and (max-width:720px) {
+  .cell{
+    height: 60px;
+    width: 60px; 
+  }
+}
+
+@media all and (max-height:800px) {
+  .cell{
+    height: 60px;
+    width: 60px; 
+  }
 }
 
 @media all and (max-width:600px) {
@@ -82,6 +96,12 @@ body {
   }
 }
 
+@media all and (max-height:600px) {
+  .cell{
+    height: 40px;
+    width: 40px; 
+  }
+}
 .square {
     border: 0px;
     height: 90%;

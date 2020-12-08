@@ -4,6 +4,7 @@ from flask_api import status, exceptions
 from flask_cors import CORS, cross_origin
 import numpy as np
 import random
+from enum import Enum
 
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -27,6 +28,14 @@ def test(data):
         return 'error', status.HTTP_404_NOT_FOUND  
 
 
+# Enum For Diffiuclty Setting + evaluation function
+def difficulty_to_number(arg):
+    switcher = {
+        'easy':1,
+        'medium':2,
+        'hard':3
+    }
+    return switcher.get(arg,0)
 # Game starts in react App board is initialized to null
 # React App passes in board data to this method
 # this method makes a move with the AI, updates the board state, and passes it back to react app
@@ -41,13 +50,11 @@ def game():
 
         # board into a 2d array
         board = parameters['board']
-        print(board)
         board_as_array = json.loads(board)
-        print(board_as_array)
 
     # Get Difficulty setting
-        difficulty = parameters['mode']
-        print(difficulty)
+        setting_as_string = parameters['mode']
+        depth = difficulty_to_number(setting_as_string)
         
         # Create New Connect Four Game
         c4 = games.ConnectFour(6,7,4)
@@ -61,11 +68,11 @@ def game():
         initialState = games.GameState(to_move=('Y'),
                             utility=0,  board=newBoard, moves=moves)
 
-                    #alpha_beta_cutoff_search(state, game, d=1, cutoff_test=None, eval_fn=None,2dArray):
-        move = games.alpha_beta_cutoff_search(c4,initialState,2,None,None,board_as_array)
+       # parameters: alpha_beta_cutoff_search(state, game, d=1, cutoff_test=None, eval_fn=None,2dArray):
+        move = games.alpha_beta_cutoff_search(c4,initialState,depth,None,None,board_as_array)
     #  print('actions: ' + str(c4.actions(initialState)))
     #  print(moves)
-        print(move)
+        print('AI selects: ' + str(move))
 
         response  =  json.dumps({'row':move[0]-1,'column':move[1]-1})
         return response, status.HTTP_200_OK
