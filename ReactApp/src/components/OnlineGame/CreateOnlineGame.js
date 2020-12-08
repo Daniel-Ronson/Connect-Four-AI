@@ -27,6 +27,7 @@ function CreateOnlineGame(){
            p2NewGame: false,
            GameOver: false,
            board: '',
+           p1Turn: true
          }).then( (docRef) => {
             console.log('DOCUMENT REF: ',  docRef.id)
             console.log(typeof  docRef.id)
@@ -45,8 +46,8 @@ function CreateOnlineGame(){
         <AppContext.Consumer>
         {(context) => (
         <div className="controlPanel">
-            <button className="mr-2" onClick={createGame}>Create Game</button>
-            <JoinGame className="aside-2" gameCode={gameCode} gameDocumentId = {gameDocumentId}></JoinGame>
+            <button className="controlPanelButton background-gray mr-2" onClick={createGame}>Create Game</button>
+            <JoinGame className="aside-2" gameJoined={context.state.gameJoined} gameDocumentId = {gameDocumentId}></JoinGame>
         </div>
         )}
         </AppContext.Consumer>

@@ -14,7 +14,9 @@ class AppProvider extends Component {
     gameCode: null,
     onlineGameJoined: false,
     onlineGameCanBeJoined: false,
-    gameDocumentId: null
+    gameDocumentId: null,
+    isOnline: false,
+    gameJoined: false
   }
 
 
@@ -29,11 +31,11 @@ class AppProvider extends Component {
           gameMode: mode
         }),
         setExperimentalFlag: () => this.setState({
-          experimentalFlag: this.state.experimentalFlag == false ? true : false
+          experimentalFlag: this.state.experimentalFlag === false ? true : false
         }),
         setGameCode: (game) => this.setState({
           gameCode: game,
-          onlineGameJoined: this.state.onlineGameJoined == false ? true : false,
+          onlineGameJoined: this.state.onlineGameJoined === false ? true : false,
           gameType: "onlineGame"
         }),
         joinOnlineGame: (flag) => this.setState({
@@ -41,15 +43,22 @@ class AppProvider extends Component {
         }),
         setGameDocumentId: (docRef) => this.setState({
           gameDocumentId: docRef
+        }),
+        toggleIsOnline: () => this.setState({
+          isOnline: this.state.isOnline === false ? true : false
+        }),
+        toggleGameJoined: (flag) => this.setState({
+          gameJoined: flag
         })
-
 
       }}>
         {this.props.children}
         {console.log('Mode: ' + this.state.gameType)}
         {console.log('gameCode State: ' + this.state.gameCode)}
         {console.log('Doc Ref: ' + this.state.gameDocumentId)}
+        {console.log('Online Mode: ' + this.state.isOnline)}
         {console.log('')}
+
 
       </AppContext.Provider>
     )

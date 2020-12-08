@@ -24,7 +24,7 @@
   }
 
 .background-green{
-  background-color: rgb(95, 190, 0);
+  background-color: #16be7b;
   color: black;
 }
 
@@ -35,24 +35,35 @@
 
 .background-gray{
     color: white;
-    background-color: rgb(129, 127, 128);
+    background-color: #6a726f;
   }
 
-  .controlPanelButton {
-    text-transform: uppercase;
-    text-decoration: none;
-    padding: 10px;
-    border-radius: 40px;
-    border: none;
-    transition: all 0.4s ease 0s;
-    font: Arial
-    }
+.controlPanelButton {
+  text-decoration: none;
+  font-family: Helvetica, Arial, Sans-Serif;
+  padding: 10px;
+  border: none;
+  transition: all 0.4s ease 0s;
+  font: Arial
+  }
 
-    .controlPanelButton:focus{
-      outline: 0;
-    }
-    .controlPanelButton:hover {
-      outline: 0;
-      text-shadow: 0px 0px 6px rgba(255, 255, 255, 1);
-      transition: all 0.4s ease 0s;
-      }
+.controlPanelButton:focus{
+  outline: 0;
+}
+.controlPanelButton:hover {
+  outline: 0;
+  text-shadow: 0px 0px 6px rgba(255, 255, 255, 1);
+  transition: all 0.4s ease 0s;
+  }
+
+.dropdown-bootrap{
+  height:44px;
+  font-family: Helvetica, Arial, Sans-Serif;
+  width: 150px;
+}
+
+input[type=text] {
+  padding: 9px;
+  border: 0px;
+  width: 220px;
+}

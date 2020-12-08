@@ -1,21 +1,22 @@
-import React from 'react';
+import React, {useState, useContext} from 'react';
 
 import {Navbar, Nav, Button} from 'react-bootstrap';
 import logo from '../images/logo.PNG'
 import '../App.css'
 import firebase from '../Firebase/Firebase' 
 import { useAuthState } from 'react-firebase-hooks/auth';
+import AppContext from '../AppContext'
+
 const auth = firebase.auth();
 
-function SignIn() {
-
-  const signInWithGoogle = () => {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider);
-  }
+function SignIn(props) {
+  const [user] = useState(props.user)
+  const appContext = useContext(AppContext)
 
   const SignInAnonymous = () => {
-    firebase.app().auth().signInAnonymously();
+     if(!auth.currentUser){firebase.app().auth().signInAnonymously()}
+     appContext.setGameType('onlineGame')
+     appContext.toggleIsOnline()
   }
 
   return (
@@ -26,18 +27,24 @@ function SignIn() {
 }
 
 function SignOut() {
-  return auth.currentUser &&(
-    <Button variant="outline-success" className="sign-out" onClick={() => auth.signOut()}>Play Offline</Button>
-  )
+  const appContext = useContext(AppContext)
+  appContext.toggleIsOnline()
+  auth.signOut() 
 }
 
-function GoOnlineButton(){
-  return(
-    <button>Go Online</button>
+function SignOutButton() {
+  let appContext = useContext(AppContext)
+  return appContext.state.isOnline === true &&(
+    <Button variant="outline-success" className="sign-out" onClick={() => {
+      appContext.toggleIsOnline()
+      appContext.setGameType('')
+    }}>
+      Play Offline</Button>
   )
 }
 
 function MyNav() {
+  const appContext = useContext(AppContext)
   const [user] = useAuthState(auth);
     return (
       <div>
@@ -55,11 +62,11 @@ function MyNav() {
         </Navbar.Brand>
 
         <Nav>
-         <Nav.Link> {user ?<React.Fragment/> :  <SignIn/> }  </Nav.Link>
+         <Nav.Link> {appContext.state.isOnline == false ? <SignIn user = {user}></SignIn>: <React.Fragment/>  }  </Nav.Link>
         </Nav>
 
         <Nav>
-         <Nav.Link>   <SignOut/>   </Nav.Link>
+         <Nav.Link>   <SignOutButton/>   </Nav.Link>
         </Nav>  
     
       
