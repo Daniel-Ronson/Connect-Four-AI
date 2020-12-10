@@ -29,8 +29,8 @@ function CreateOnlineGame(){
            board: '',
            p1Turn: true
          }).then( (docRef) => {
-            console.log('DOCUMENT REF: ',  docRef.id)
-            console.log(typeof  docRef.id)
+           // console.log('DOCUMENT REF: ',  docRef.id)
+         //   console.log(typeof  docRef.id)
             appContext.setGameType('onlineGame')
             setGameCode(gameCode)
             setgameDocumentId(docRef.id)
@@ -39,7 +39,7 @@ function CreateOnlineGame(){
          }).catch ( (error) => {
              console.log('error adding new game to db')
          })
-        console.log('gamecode: ' + gameCode)
+       // console.log('gamecode: ' + gameCode)
     }
 
     return (    

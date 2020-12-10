@@ -10,7 +10,7 @@ function JoinGame(props){
     }
 
     useEffect(() => {
-        console.log('use effect')
+     //   console.log('use effect')
         setInput(props.gameDocumentId)
         setGameJoined(props.setGameJoined)
     },[props.gameDocumentId,props.gameJoined])

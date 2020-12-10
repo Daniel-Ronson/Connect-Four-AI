@@ -141,7 +141,7 @@ class ConnectFour extends React.Component {
           let toggle_player = this.togglePlayer()
           this.setState({ board, currentPlayer: toggle_player });  
 
-          console.log(gameType)
+         // console.log(gameType)
           // Call AI algorithm if Single Player game
           if(gameType === 'singlePlayer' && toggle_player === this.state.player2){
             let ai_move_column = await postBoardState(board,gameDifficulty)  // Make call to AI algorithm

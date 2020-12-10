@@ -32,7 +32,7 @@ const getResuest = () =>{
     })
     .then(function () {
       // always executed
-      console.log('always executed callback');
+    //  console.log('always executed callback');
     });    
 
 }

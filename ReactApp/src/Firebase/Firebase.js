@@ -15,5 +15,7 @@ firebase.initializeApp({
   measurementId: "G-9R2TQC19G6"
 })
 }
+  // Initialize Firebase Analytics
+//  firebase.analytics();
 
 export default firebase
