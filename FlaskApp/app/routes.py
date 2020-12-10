@@ -10,12 +10,12 @@ cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 import json
 
-@app.route('/index')
-def index():
-    return app.send_static_file('index.html')
+# @app.route('/index')
+# def index():
+#     return app.send_static_file('index.html')
 
-# ex url /test/teststring
-# shows how to get query parameters ?param1=danny&param2=student
+# # ex url /test/teststring
+# # shows how to get query parameters ?param1=danny&param2=student
 @app.route('/test/<string:data>',methods=['GET'])
 def test(data):
     print(data)
