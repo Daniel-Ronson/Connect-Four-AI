@@ -15,12 +15,14 @@
 
   @media all and (max-width:600px) {
     .controlPanel{
-      flex-flow: column wrap;
       padding: 0;
     }
-    .aside-2{
-      padding:10px 0 10px;
+    .aside-1{
+      padding:10px 0 10px;     
     }
+    .aside-2 {order:1}
+    .middlePanel {order:2}
+    .aside-3{order:3}
   }
 
 .background-green{

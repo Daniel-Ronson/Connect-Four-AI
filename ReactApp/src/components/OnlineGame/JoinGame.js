@@ -21,8 +21,9 @@ function JoinGame(props){
             <React.Fragment>
             <form>
                 <label className="mr-2 mt-2">Enter Code: </label>
-                    <input type="text" className = "mr-2" value={gameInput} onChange={e => setInput(e.target.value)}/>
-                <input className={`controlPanelButton ${context.state.gameJoined===true ? 'background-green' : 'background-gray'}`} type="submit" value="Join Game" onClick={e =>{
+                    <input type="text" className = "middlePanel mr-2" value={gameInput} onChange={e => setInput(e.target.value)}/>
+                <input className={`aside-3 mt-2 controlPanelButton ${context.state.gameJoined===true ? 'background-green' : 'background-gray'}`} 
+                type="submit" value="Join Game" onClick={e =>{
                     e.preventDefault()
                    // context.setGameCode(gameInput)
                     context.setGameType('onlineGame')
