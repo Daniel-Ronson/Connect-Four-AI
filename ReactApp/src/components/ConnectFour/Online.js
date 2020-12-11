@@ -28,7 +28,7 @@ function OnlineGame(props){
   useEffect( () => {
     setGameDocId(props.gameDocumentId)
     //setBoard(JSON.parse(boardInitialState))
-    console.log('searching for doc: ' , props.gameDocumentId)
+    //console.log('searching for doc: ' , props.gameDocumentId)
     if(props.gameDocumentId !==  null){
     const unsubscribe = gameRef.doc(props.gameDocumentId)
     .onSnapshot(
@@ -36,18 +36,18 @@ function OnlineGame(props){
         if(typeof doc.data() !== 'undefined'){
           if (uid === doc.data().p1ID){
             setIsPlayer1(true)
-            console.log('is player 1')
+          //  console.log('is player 1')
           }
           // toDO: set doc.data().p2ID = uid
           //if (uid === doc.data().p2ID){
           else {
             setIsPlayer1(false)
-            console.log('is not player 1')
+           // console.log('is not player 1')
           }
           //else {setReturnErrorMessage(true); return;}
       
-          console.log('GOT data: ')
-          console.log(doc.data())
+         // console.log('GOT data: ')
+        //  console.log(doc.data())
 
          setIsTurn(doc.data().p1Turn)
          let newBoard = JSON.parse(boardInitialState)
@@ -76,14 +76,14 @@ function OnlineGame(props){
 
  const updateGame = async (newBoard) => {
       firestore.collection('Game').doc(gameDocId).update({board: newBoard}).then( () => {
-        console.log('update Successful')
+     //   console.log('update Successful')
         return true
       }).catch(() => {console.log('Update Failure'); return false})
   }
   const togglePlayer = async () => {
     let flag = isTurn ? false : true
     firestore.collection('Game').doc(gameDocId).update({p1Turn: flag}).then( () => {
-      console.log('update Successful')
+   //   console.log('update Successful')
       return true
     }).catch(() => {console.log('Update Failure'); return false})
   }
@@ -91,7 +91,7 @@ function OnlineGame(props){
   const makeMoveOnline = async (newBoard) => {
     let flag = isTurn ? false : true
     firestore.collection('Game').doc(gameDocId).update({board: newBoard,p1Turn: flag}).then( () => {
-      console.log('update Successful')
+  //    console.log('update Successful')
       return true
     }).catch(() => {console.log('Update Failure'); return false})
   }
@@ -104,7 +104,7 @@ function OnlineGame(props){
 
   const setNewGame = async ()  => {
     await firestore.collection('Game').doc(gameDocId).update({board: boardInitialState,p1Turn: true}).then( (doc) => {
-      console.log('game cleared')
+  //    console.log('game cleared')
 
     }).catch(() => {console.log('New Game Failed');})
     setStateToBase()

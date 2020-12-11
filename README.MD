@@ -8,5 +8,9 @@
 4. React App now reachable at http://127.0.0.1:5000/index
 5. For developing React App, start server with `npm start` for live updates
 
+## Software Dependencies:
+1. Node.js
+2. Python3, pip
+
 
 

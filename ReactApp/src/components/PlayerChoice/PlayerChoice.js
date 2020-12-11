@@ -38,7 +38,7 @@ class PlayerChoice extends React.Component{
                     </Dropdown.Menu>
                 </Dropdown>
             </div>
-            <div className="aside-2">
+            <div className="aside-1">
             <button className={`controlPanelButton mr-2 ${context.state.gameType === 'multiPlayer' ? 'background-green' : 'background-gray'}`} value= "multiPlayer" onClick={e => context.setGameType(e.target.value)}>
                     Multiplayer
                 </button>

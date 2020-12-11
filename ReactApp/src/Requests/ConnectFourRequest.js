@@ -1,6 +1,6 @@
 const axios = require('axios')
 
-let baseUrl = 'http://127.0.0.1:5000/'
+let baseUrl = 'https://flask-ai-v4bjg2kvta-uw.a.run.app/'
 
 // Input: Current State of board
 // Output: New state of board after AI makes a move
@@ -32,7 +32,7 @@ const getResuest = () =>{
     })
     .then(function () {
       // always executed
-      console.log('always executed callback');
+    //  console.log('always executed callback');
     });    
 
 }

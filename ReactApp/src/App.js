@@ -1,5 +1,5 @@
 import './App.css'
-import React from 'react';
+import React, {useEffect} from 'react';
 import AppContext from './AppContext'
 import ConnectFour from './components/ConnectFour/ConnectFour'
 import OnlineGame from './components/ConnectFour/Online'
@@ -9,9 +9,24 @@ import {Container, Col, Row} from 'react-bootstrap';
 import firebase from './Firebase/Firebase' 
 import { useAuthState } from 'react-firebase-hooks/auth';
 import CreateOnlineGame from './components/OnlineGame/CreateOnlineGame';
+// import {initGA, pageView} from './Firebase/Analytics'
+// const analytics =   firebase.analytics();
+
 const auth = firebase.auth();
+const firestore = firebase.firestore();
+const pageViewRef = firestore.collection('PageViews')
 
 function App(){
+
+  useEffect( () => {
+    // Rudimentary Page View Counter
+    const data = pageViewRef.doc('KvBM3DxmleEUHfabRLZU').get().then( (doc) =>{
+      const pageHits = doc.data().PageHits + 1
+      console.log('writing: ' + pageHits)
+      pageViewRef.doc('KvBM3DxmleEUHfabRLZU').update({PageHits:pageHits})
+    })
+  },[])
+
   const [user] = useAuthState(auth);
     return (
       <AppContext.Consumer>

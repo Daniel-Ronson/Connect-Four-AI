@@ -1,2 +1,7 @@
 
 ReactApp/package-lock.json
+ReactApp/firebase.json
+ReactApp/.firebaserc
+FlaskApp/cloudbuild.yml
+ReactApp/.firebase/hosting.YnVpbGQ.cache
+node_modules/react-ga/*

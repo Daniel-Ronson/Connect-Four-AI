@@ -29,8 +29,8 @@ function CreateOnlineGame(){
            board: '',
            p1Turn: true
          }).then( (docRef) => {
-            console.log('DOCUMENT REF: ',  docRef.id)
-            console.log(typeof  docRef.id)
+           // console.log('DOCUMENT REF: ',  docRef.id)
+         //   console.log(typeof  docRef.id)
             appContext.setGameType('onlineGame')
             setGameCode(gameCode)
             setgameDocumentId(docRef.id)
@@ -39,15 +39,15 @@ function CreateOnlineGame(){
          }).catch ( (error) => {
              console.log('error adding new game to db')
          })
-        console.log('gamecode: ' + gameCode)
+       // console.log('gamecode: ' + gameCode)
     }
 
     return (    
         <AppContext.Consumer>
         {(context) => (
         <div className="controlPanel">
-            <button className="controlPanelButton background-gray mr-2" onClick={createGame}>Create Game</button>
-            <JoinGame className="aside-2" gameJoined={context.state.gameJoined} gameDocumentId = {gameDocumentId}></JoinGame>
+            <button className="controlPanelButton background-gray mr-2 aside-2 mt-2" onClick={createGame}>Create Game</button>
+            <JoinGame className="" gameJoined={context.state.gameJoined} gameDocumentId = {gameDocumentId}></JoinGame>
         </div>
         )}
         </AppContext.Consumer>
